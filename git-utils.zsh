@@ -68,7 +68,7 @@ function _grep_history_branch() {
   git log --oneline -G"$1" $(git merge-base $(git branch --show-current) $(main-branch-name))..
 }
 alias grep-history-branch='_grep_history_branch'
-alias grephb='grep-history'
+alias grephb='grep-history-branch'
 
 # Grep something in history
 function _grep_history() {
