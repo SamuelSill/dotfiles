@@ -58,6 +58,11 @@ function graph2 {
     git log --graph --abbrev-commit --decorate --format=format:"%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)`n          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)"
 }
 
+function graph-main {
+    $main = main-branch-name
+    git log --abbrev-commit --decorate --format=format:"%C(bold blue)%h%C(reset) %C(bold green)%<(12)%ar%C(reset) %C(dim white)%<(17)%an%C(reset) %C(white)%<(61)%s%C(reset) %C(auto)%d%C(reset)" $main
+}
+
 Set-Alias graph graph1
 
 # File history

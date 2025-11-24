@@ -43,6 +43,10 @@ alias graph1="git log --graph --abbrev-commit --decorate --format=format:'%C(bol
 alias graph2="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'"
 alias graph="graph1"
 
+function graph-main() {
+  git log --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) %C(bold green)%<(12)%ar%C(reset) %C(dim white)%<(17)%an%C(reset) %C(white)%<(61)%s%C(reset) %C(auto)%d%C(reset)' $(main-branch-name)
+}
+
 # See history of a file
 alias diff-history='git log -p -- $(select-file)'
 alias dh='diff-history'
