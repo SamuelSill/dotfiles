@@ -183,6 +183,110 @@ function get-commit-version {
 }
 Set-Alias gcv get-commit-version
 
+# Checkout to an existing local branch using fzf
+function git-checkout {
+    $branch = git for-each-ref --format='%(refname:short)' refs/heads/ | 
+              fzf --height=40% --border --ansi --preview 'git log -n 10 --color=always {}'
+
+    if ($branch) {
+        git checkout $branch
+    }
+}
+
+# Delete all local branches that have been merged to main, are in sync with remote, or end with _old
+function delete-stale-branches {
+    $mainBranch = (main-branch-name) -replace '^origin/', ''
+    $currentBranch = git branch --show-current
+    $branchesToDelete = @{}
+
+    Write-Host "Scanning for stale branches..."
+    Write-Host ""
+    Write-Host "Already merged branches to delete:"
+
+    # Get merged branches
+    $mergedBranches = git branch --merged $mainBranch | 
+                      Where-Object { $_ -notmatch '\*' -and $_ -notmatch "^\s*${mainBranch}$" -and 
+                                     $_ -notmatch '^\s*master$' -and $_ -notmatch "^\s*${currentBranch}$" } |
+                      ForEach-Object { $_.Trim() }
+
+    foreach ($branch in $mergedBranches) {
+        $branchesToDelete[$branch] = $true
+        Write-Host "  $branch"
+    }
+
+    # Check for branches merged via rebase
+    $allBranches = git for-each-ref --format='%(refname:short)' refs/heads/
+    foreach ($branch in $allBranches) {
+        if ($branch -eq $mainBranch -or $branch -eq $currentBranch -or $branchesToDelete.ContainsKey($branch)) {
+            continue
+        }
+
+        $commitsNotInMain = (git log --cherry-pick --right-only --oneline "$mainBranch...$branch" 2>$null | Measure-Object).Count
+        if ($commitsNotInMain -eq 0) {
+            $branchesToDelete[$branch] = $true
+            Write-Host "  $branch"
+        }
+    }
+
+    Write-Host ""
+    Write-Host "Branches not diverged from remote to delete:"
+
+    # Get branches not diverged from remote
+    foreach ($branch in $allBranches) {
+        if ($branch -eq $mainBranch -or $branch -eq $currentBranch -or $branchesToDelete.ContainsKey($branch)) {
+            continue
+        }
+
+        $remoteExists = git show-ref --verify --quiet "refs/remotes/origin/$branch" 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            $divergedCommits = (git rev-list "origin/$branch..$branch" --count 2>$null)
+            if ($divergedCommits -eq "0") {
+                $branchesToDelete[$branch] = $true
+                Write-Host "  $branch"
+            }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "Branches ending with _old to delete:"
+
+    $oldBranches = git for-each-ref --format='%(refname:short)' refs/heads/ | 
+                   Where-Object { $_ -match '_old$' -and $_ -ne $currentBranch }
+
+    foreach ($branch in $oldBranches) {
+        if (-not $branchesToDelete.ContainsKey($branch)) {
+            $branchesToDelete[$branch] = $true
+            Write-Host "  $branch"
+        }
+    }
+
+    if ($branchesToDelete.Count -eq 0) {
+        Write-Host "No stale branches to delete."
+        return
+    }
+
+    Write-Host ""
+    Write-Host "Branches remaining after deletion:"
+    $allBranchesDisplay = git branch
+    foreach ($line in $allBranchesDisplay) {
+        $branchName = $line.Trim() -replace '^\*\s*', ''
+        if (-not $branchesToDelete.ContainsKey($branchName)) {
+            Write-Host $line
+        }
+    }
+    Write-Host ""
+
+    $confirm = Read-Host "Delete these branches? (y/N)"
+    if ($confirm -match '^[Yy]$') {
+        foreach ($branch in $branchesToDelete.Keys) {
+            git branch -D $branch
+        }
+        Write-Host "Stale branches deleted successfully." -ForegroundColor Green
+    } else {
+        Write-Host "Aborted." -ForegroundColor Yellow
+    }
+}
+
 # List branches created by the current user
 function list-my-branches {
     $currentUser = (git config user.name) -replace ' ', '_'
