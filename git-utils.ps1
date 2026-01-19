@@ -182,3 +182,17 @@ function get-commit-version {
     }
 }
 Set-Alias gcv get-commit-version
+
+# List branches created by the current user
+function list-my-branches {
+    $currentUser = (git config user.name) -replace ' ', '_'
+
+    # List local branches
+    git for-each-ref --format='%(refname:short)' refs/heads/ | 
+        Where-Object { $_ -match "^$currentUser/" }
+
+    # List remote branches
+    git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | 
+        Where-Object { $_ -match "^origin/$currentUser/" }
+}
+Set-Alias lmb list-my-branches
