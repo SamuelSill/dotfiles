@@ -8,12 +8,20 @@ function main-branch-name {
 }
 Set-Alias mbn main-branch-name
 
-# Select a commit from the current branch history
-function select-commit-branch {
+function main-parent-commit {
     $main = main-branch-name
     $current = git branch --show-current
-    $mergeBase = git merge-base $current $main
-    $commits = git log --pretty=format:"%H %s (%ci)" --abbrev-commit "$mergeBase.."
+    git merge-base $current $main
+}
+
+function log-current-branch() {
+    $mergeBase = main-parent-commit
+    git log --abbrev-commit "$mergeBase.." $@
+}
+
+# Select a commit from the current branch history
+function select-commit-branch {
+    $commits = log-current-branch --pretty=format:"%H %s (%ci)"
     $scriptDir = $PSScriptRoot
     $selected = $commits | fzf --height=40% --border --ansi
     if ($selected) {
@@ -42,9 +50,7 @@ Set-Alias self select-file
 
 # Interactive rebase current branch against main
 function interactive-rebase {
-    $main = main-branch-name
-    $current = git branch --show-current
-    $mergeBase = git merge-base $current $main
+    $mergeBase = main-parent-commit
     git rebase -i "$mergeBase"
 }
 Set-Alias ir interactive-rebase
@@ -73,9 +79,7 @@ function diff-history {
 Set-Alias dh diff-history
 
 function diff-history-branch {
-    $main = main-branch-name
-    $current = git branch --show-current
-    $mergeBase = git merge-base $current $main
+    $mergeBase = main-parent-commit
     $file = select-file
     git log -p "$mergeBase.." -- "$file"
 }
@@ -88,9 +92,7 @@ function commit-history {
 Set-Alias ch commit-history
 
 function commit-history-branch {
-    $main = main-branch-name
-    $current = git branch --show-current
-    $mergeBase = git merge-base $current $main
+    $mergeBase = main-parent-commit
     $file = select-file
     git log --oneline "$mergeBase.." -- "$file"
 }
@@ -106,9 +108,7 @@ Set-Alias tc temp-commit
 # Grep history (branch)
 function grep-history-branch {
     param([string]$Pattern)
-    $main = main-branch-name
-    $current = git branch --show-current
-    $mergeBase = git merge-base $current $main
+    $mergeBase = main-parent-commit
     git log --oneline -G"$Pattern" "$mergeBase.."
 }
 Set-Alias grephb grep-history-branch

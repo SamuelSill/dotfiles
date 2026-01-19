@@ -2,9 +2,17 @@
 alias main-branch-name='git symbolic-ref --short refs/remotes/origin/HEAD'
 alias mbn='main-branch-name'
 
+function main-parent-commit() {
+  git merge-base $(git branch --show-current) $(main-branch-name)
+}
+
+function log-current-branch() {
+  git log --abbrev-commit $(main-parent-commit).. $@
+}
+
 # Shows all commits in the current branch and returns the hash of the selected commit
 function select-commit-branch() {
-  local commit_hash=$(git log --pretty=format:'%H %s (%ci)' --abbrev-commit $(git merge-base $(git branch --show-current) $(main-branch-name)).. | \
+  local commit_hash=$(log-current-branch --pretty=format:'%H %s (%ci)' | \
     fzf --height=40% --border --ansi --preview 'echo {} | cut -d" " -f1 | xargs git show --color=always --stat')
 
   if [[ -n "$commit_hash" ]]; then
@@ -35,7 +43,7 @@ function select-file() {
 alias self='select-file'
 
 # Interactive rebase the current branch against the main branch
-alias interactive-rebase='git rebase -i $(git merge-base $(git branch --show-current) $(main-branch-name))'
+alias interactive-rebase='git rebase -i $(main-parent-commit)'
 alias ir='interactive-rebase'
 
 # Graph aliases
@@ -52,7 +60,7 @@ alias diff-history='git log -p -- $(select-file)'
 alias dh='diff-history'
 
 # See history of a file in the current branch
-alias diff-history-branch='git log -p $(git merge-base $(git branch --show-current) $(main-branch-name)).. -- $(select-file)'
+alias diff-history-branch='git log -p $(main-parent-commit).. -- $(select-file)'
 alias dhb='diff-history-branch'
 
 # See commits affecting a file
@@ -60,7 +68,7 @@ alias commit-history='git log --oneline -- $(select-file)'
 alias ch='commit-history'
 
 # See commits affecting a file in the current branch
-alias commit-history-branch='git log --oneline $(git merge-base $(git branch --show-current) $(main-branch-name)).. -- $(select-file)'
+alias commit-history-branch='git log --oneline $(main-parent-commit).. -- $(select-file)'
 alias chb='commit-history-branch'
 
 # Create a temporary commit
@@ -69,7 +77,7 @@ alias tc='temp-commit'
 
 # Grep something in the history of the current branch
 function _grep_history_branch() {
-  git log --oneline -G"$1" $(git merge-base $(git branch --show-current) $(main-branch-name))..
+  git log --oneline -G"$1" $(main-parent-commit)..
 }
 alias grep-history-branch='_grep_history_branch'
 alias grephb='grep-history-branch'
