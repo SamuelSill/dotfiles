@@ -1,0 +1,174 @@
+[
+  {
+    "name": "main-branch-name",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/main_branch.py\""
+  },
+  {
+    "name": "mbn",
+    "command": "main-branch-name"
+  },
+  {
+    "name": "main-parent-commit",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/main_parent_commit.py\""
+  },
+  {
+    "name": "log-current-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/log_branch.py\""
+  },
+  {
+    "name": "select-commit-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/select_commit_branch.py\""
+  },
+  {
+    "name": "selcb",
+    "command": "select-commit-branch"
+  },
+  {
+    "name": "select-commit",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/select_commit.py\""
+  },
+  {
+    "name": "selc",
+    "command": "select-commit"
+  },
+  {
+    "name": "select-file",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/select_file.py\""
+  },
+  {
+    "name": "self",
+    "command": "select-file"
+  },
+  {
+    "name": "interactive-rebase",
+    "command": "git rebase -i $(main-parent-commit)"
+  },
+  {
+    "name": "ir",
+    "command": "interactive-rebase"
+  },
+  {
+    "name": "graph1",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\" --format 1"
+  },
+  {
+    "name": "graph2",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\" --format 2"
+  },
+  {
+    "name": "graph",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\""
+  },
+  {
+    "name": "graph-main",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/graph_main.py\""
+  },
+  {
+    "name": "diff-history",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_history.py\""
+  },
+  {
+    "name": "dh",
+    "command": "diff-history"
+  },
+  {
+    "name": "diff-history-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_history_branch.py\""
+  },
+  {
+    "name": "dhb",
+    "command": "diff-history-branch"
+  },
+  {
+    "name": "commit-history",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_history.py\""
+  },
+  {
+    "name": "ch",
+    "command": "commit-history"
+  },
+  {
+    "name": "commit-history-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_history_branch.py\""
+  },
+  {
+    "name": "chb",
+    "command": "commit-history-branch"
+  },
+  {
+    "name": "temp-commit",
+    "command": "git commit --no-verify -m \"temp\""
+  },
+  {
+    "name": "tc",
+    "command": "temp-commit"
+  },
+  {
+    "name": "grep-history-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_history.py\" --branch"
+  },
+  {
+    "name": "grephb",
+    "command": "grep-history-branch"
+  },
+  {
+    "name": "grep-history",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_history.py\""
+  },
+  {
+    "name": "greph",
+    "command": "grep-history"
+  },
+  {
+    "name": "grep-commit-branch",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_commit.py\" --branch"
+  },
+  {
+    "name": "grepcb",
+    "command": "grep-commit-branch"
+  },
+  {
+    "name": "grep-commit",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_commit.py\""
+  },
+  {
+    "name": "grepc",
+    "command": "grep-commit"
+  },
+  {
+    "name": "fixup",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/fixup.py\""
+  },
+  {
+    "name": "check-no-local-changes",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/check_changes.py\""
+  },
+  {
+    "name": "diff-origin",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_origin.py\""
+  },
+  {
+    "name": "get-commit-version",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_version.py\" $(select-commit)"
+  },
+  {
+    "name": "gcv",
+    "command": "get-commit-version"
+  },
+  {
+    "name": "git-checkout",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/git_checkout.py\""
+  },
+  {
+    "name": "delete-stale-branches",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/delete_stale_branches.py\""
+  },
+  {
+    "name": "list-my-branches",
+    "command": "python3 \"$SCRIPT_DIR/git-utils/list_my_branches.py\""
+  },
+  {
+    "name": "lmb",
+    "command": "list-my-branches"
+  }
+]
