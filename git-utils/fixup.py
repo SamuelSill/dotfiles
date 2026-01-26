@@ -16,7 +16,7 @@ def main():
 
         # Create fixup commit
         repo = Repo(search_parent_directories=True)
-        repo.git.commit(f'--fixup={commit_hash}')
+        repo.git.execute(['git', 'commit', f'--fixup={commit_hash}'])
 
         # Rebase with autosquash
         parent_hash = f'{commit_hash}~1'

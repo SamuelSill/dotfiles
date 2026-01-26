@@ -61,7 +61,7 @@ def main():
 
     if not aliases_path.exists():
         print(f"Error: {aliases_path} not found", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
     try:
         with open(aliases_path, 'r') as f:
@@ -69,15 +69,16 @@ def main():
 
         if args.shell_type not in ('sh', 'powershell'):
             print(f"Error: Unknown shell type '{args.shell_type}'", file=sys.stderr)
-            sys.exit(1)
+            return 1
 
         output = generate_aliases(aliases, args.script_dir, args.shell_type)
         print(output)
+        return 0
 
     except Exception as e:
         print(f"Error loading aliases: {e}", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

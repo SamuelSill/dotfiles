@@ -5,15 +5,19 @@ import sys
 from git import Repo
 
 
+def get_main_branch(repo: Repo):
+    # Get the symbolic reference for origin/HEAD
+    origin = repo.remotes.origin
+    # The origin HEAD reference points to the main branch
+    main_ref = origin.refs.HEAD.reference
+    # Extract just the branch name (without 'origin/')
+    return main_ref.name.replace('origin/', '')
+
+
 def main():
     try:
         repo = Repo(search_parent_directories=True)
-        # Get the symbolic reference for origin/HEAD
-        origin = repo.remotes.origin
-        # The origin HEAD reference points to the main branch
-        main_ref = origin.refs.HEAD.reference
-        # Extract just the branch name (without 'origin/')
-        main_branch = main_ref.name.replace('origin/', '')
+        main_branch = get_main_branch(repo)
         print(main_branch)
         return 0
     except Exception as e:
