@@ -8,8 +8,6 @@ from git import Repo
 
 def check_no_local_changes(repo: Repo):
     try:
-        print(f"Checking for local changes in {repo.working_dir}...")
-
         if repo.is_dirty(untracked_files=True):
             repo_name = os.path.basename(repo.working_dir)
             print(f"There are local changes ({repo_name}). Please stash or commit them.", file=sys.stderr)

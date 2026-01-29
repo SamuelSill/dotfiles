@@ -38,18 +38,14 @@ def main():
         # Search each branch for the closest future tag
         for branch in branches:
             try:
-                branch_ref = repo.refs[branch]
-
                 # Get commits from the specified commit to the branch
-                commits = list(repo.iter_commits(f'{commit_hash}..{branch}'))
+                commits = list(repo.iter_commits(f'{commit_hash}..{branch}', reverse=True))
 
                 # Look for tags in these commits
                 for c in commits:
-                    # Check if this commit has any tags
-                    tags = [tag for tag in repo.tags if tag.commit == c]
+                    tags = repo.git.tag('--points-at', c.hexsha).strip()
                     if tags:
-                        # Found a tag, print it
-                        print(f"{branch}: {tags[0].name}")
+                        print(f"{branch}: {tags.replace('\n', ', ')}")
                         break
             except Exception:
                 continue

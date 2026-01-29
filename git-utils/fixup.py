@@ -2,7 +2,7 @@
 """Fixup staged changes into a selected commit in the current branch."""
 
 import sys
-from git import Repo
+import subprocess
 from select_commit_branch import select_commit_branch
 
 
@@ -15,12 +15,11 @@ def main():
             return 0
 
         # Create fixup commit
-        repo = Repo(search_parent_directories=True)
-        repo.git.execute(['git', 'commit', f'--fixup={commit_hash}'])
+        subprocess.run(['git', 'commit', f'--fixup={commit_hash}'], check=True)
 
         # Rebase with autosquash
         parent_hash = f'{commit_hash}~1'
-        repo.git.execute(['git', '-c', 'core.editor=true', 'rebase', '-i', '--autosquash', parent_hash])
+        subprocess.run(['git', '-c', 'core.editor=true', 'rebase', '-i', '--autosquash', parent_hash], check=True)
 
         return 0
     except Exception as e:
