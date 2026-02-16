@@ -1,18 +1,8 @@
-# Setup Oh My Zsh
+#!/bin/zsh
+
+# Setup Oh My Zsh (zsh-specific)
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
 source $ZSH/oh-my-zsh.sh
 RPROMPT="[%D{%H:%M:%S}]"
-
-# Setup fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Setup pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
-eval "$(pyenv virtualenv-init - zsh)"
-
-# Setup gh-copilot
-eval "$(gh copilot alias -- zsh)"
