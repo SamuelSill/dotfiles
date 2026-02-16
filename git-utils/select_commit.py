@@ -11,7 +11,7 @@ def main():
         repo = Repo(search_parent_directories=True)
 
         # Get formatted commit list
-        commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)')
+        commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)')
 
         if not commits:
             return 0
@@ -20,7 +20,7 @@ def main():
         try:
             # Run fzf with proper terminal interaction
             proc = subprocess.Popen(
-                ['fzf', '--height=40%', '--border', '--ansi',
+                ['fzf', '--height=40%', '--border', '--ansi', '--tiebreak=index',
                  '--preview', 'echo {} | cut -d" " -f1 | xargs git show --color=always --stat'],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,

@@ -25,7 +25,7 @@ def select_commit_branch():
 
     # Get formatted commit list
     revision_range = f"{merge_base[0].hexsha}.."
-    commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)', revision_range)
+    commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)', revision_range)
 
     if not commits:
         return None
