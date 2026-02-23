@@ -2,12 +2,14 @@
 
 # Get the directory where this script is located
 # Works when sourced from bash or zsh
+# Use DOTFILES_DIR to avoid conflicts with other scripts using SCRIPT_DIR
 if [ -n "$BASH_VERSION" ]; then
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 elif [ -n "$ZSH_VERSION" ]; then
-    SCRIPT_DIR="${0:A:h}"
+    DOTFILES_DIR="${0:A:h}"
 else
-    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 fi
+export DOTFILES_DIR
 
-eval "$(python3 "$SCRIPT_DIR/load_aliases.py" sh "$SCRIPT_DIR/aliases.json")"
+eval "$(python3 "$DOTFILES_DIR/load_aliases.py" sh "$DOTFILES_DIR/aliases.json")"

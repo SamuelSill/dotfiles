@@ -1,7 +1,7 @@
 [
   {
     "name": "main-branch-name",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/main_branch.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/main_branch.py\""
   },
   {
     "name": "mbn",
@@ -9,15 +9,15 @@
   },
   {
     "name": "main-parent-commit",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/main_parent_commit.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/main_parent_commit.py\""
   },
   {
     "name": "log-current-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/log_branch.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/log_branch.py\""
   },
   {
     "name": "select-commit-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/select_commit_branch.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/select_commit_branch.py\""
   },
   {
     "name": "selcb",
@@ -25,7 +25,7 @@
   },
   {
     "name": "select-commit",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/select_commit.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/select_commit.py\""
   },
   {
     "name": "selc",
@@ -33,7 +33,7 @@
   },
   {
     "name": "select-file",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/select_file.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/select_file.py\""
   },
   {
     "name": "self",
@@ -49,23 +49,23 @@
   },
   {
     "name": "graph1",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\" --format 1"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/graph.py\" --format 1"
   },
   {
     "name": "graph2",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\" --format 2"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/graph.py\" --format 2"
   },
   {
     "name": "graph",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/graph.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/graph.py\""
   },
   {
     "name": "graph-main",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/graph_main.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/graph_main.py\""
   },
   {
     "name": "diff-history",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_history.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/diff_history.py\""
   },
   {
     "name": "dh",
@@ -73,7 +73,7 @@
   },
   {
     "name": "diff-history-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_history_branch.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/diff_history_branch.py\""
   },
   {
     "name": "dhb",
@@ -81,7 +81,7 @@
   },
   {
     "name": "commit-history",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_history.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/commit_history.py\""
   },
   {
     "name": "ch",
@@ -89,7 +89,7 @@
   },
   {
     "name": "commit-history-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_history_branch.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/commit_history_branch.py\""
   },
   {
     "name": "chb",
@@ -105,7 +105,7 @@
   },
   {
     "name": "grep-history-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_history.py\" --branch"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/grep_history.py\" --branch"
   },
   {
     "name": "grephb",
@@ -113,7 +113,7 @@
   },
   {
     "name": "grep-history",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_history.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/grep_history.py\""
   },
   {
     "name": "greph",
@@ -121,7 +121,7 @@
   },
   {
     "name": "grep-commit-branch",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_commit.py\" --branch"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/grep_commit.py\" --branch"
   },
   {
     "name": "grepcb",
@@ -129,7 +129,7 @@
   },
   {
     "name": "grep-commit",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/grep_commit.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/grep_commit.py\""
   },
   {
     "name": "grepc",
@@ -137,19 +137,19 @@
   },
   {
     "name": "fixup",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/fixup.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/fixup.py\""
   },
   {
     "name": "check-no-local-changes",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/check_changes.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/check_changes.py\""
   },
   {
     "name": "diff-origin",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/diff_origin.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/diff_origin.py\""
   },
   {
     "name": "get-commit-version",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/commit_version.py\" $(select-commit)"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/commit_version.py\" $(select-commit)"
   },
   {
     "name": "gcv",
@@ -157,15 +157,15 @@
   },
   {
     "name": "git-checkout",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/git_checkout.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/git_checkout.py\""
   },
   {
     "name": "delete-stale-branches",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/delete_stale_branches.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/delete_stale_branches.py\""
   },
   {
     "name": "list-my-branches",
-    "command": "python3 \"$SCRIPT_DIR/git-utils/list_my_branches.py\""
+    "command": "python3 \"$DOTFILES_DIR/git-utils/list_my_branches.py\""
   },
   {
     "name": "lmb",
