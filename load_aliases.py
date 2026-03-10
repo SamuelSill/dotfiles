@@ -10,11 +10,12 @@ from pathlib import Path
 
 
 def create_alias_command(name, command, shell_type):
-    """Create an alias command for the specified shell type."""
+    """Create an alias/function command for the specified shell type."""
     if shell_type == 'sh':
-        # Escape single quotes in the command
+        # Use functions instead of aliases for better syntax highlighting
+        # Functions are validated by name only, not by content
         cmd_escaped = command.replace("'", "'\\''")
-        return f"alias {name}='{cmd_escaped}'"
+        return f"{name}() {{ {cmd_escaped}; }}"
     elif shell_type == 'powershell':
         # Create a function that invokes the command
         cmd_escaped = command.replace('"', '`"')
@@ -27,10 +28,14 @@ def generate_aliases(aliases, shell_type):
     """Generate alias commands for the specified shell type."""
     commands = []
     for alias_def in aliases:
-        name = alias_def['name']
+        names = alias_def['name']
         cmd = alias_def['command']
-        commands.append(create_alias_command(name, cmd, shell_type))
-        print(commands[-1])
+        # Support both string and array for "name"
+        if isinstance(names, str):
+            names = [names]
+        for name in names:
+            commands.append(create_alias_command(name, cmd, shell_type))
+            print(commands[-1])
 
     return '\n'.join(commands)
 

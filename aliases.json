@@ -1,11 +1,7 @@
 [
   {
-    "name": "main-branch-name",
+    "name": ["main-branch-name", "mbn"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/main_branch.py\""
-  },
-  {
-    "name": "mbn",
-    "command": "main-branch-name"
   },
   {
     "name": "main-parent-commit",
@@ -16,36 +12,20 @@
     "command": "python3 \"$DOTFILES_DIR/git-utils/log_branch.py\""
   },
   {
-    "name": "select-commit-branch",
+    "name": ["select-commit-branch", "selcb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/select_commit_branch.py\""
   },
   {
-    "name": "selcb",
-    "command": "select-commit-branch"
-  },
-  {
-    "name": "select-commit",
+    "name": ["select-commit", "selc"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/select_commit.py\""
   },
   {
-    "name": "selc",
-    "command": "select-commit"
-  },
-  {
-    "name": "select-file",
+    "name": ["select-file", "self"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/select_file.py\""
   },
   {
-    "name": "self",
-    "command": "select-file"
-  },
-  {
-    "name": "interactive-rebase",
+    "name": ["interactive-rebase", "ir"],
     "command": "git rebase -i $(main-parent-commit)"
-  },
-  {
-    "name": "ir",
-    "command": "interactive-rebase"
   },
   {
     "name": "graph1",
@@ -64,76 +44,40 @@
     "command": "python3 \"$DOTFILES_DIR/git-utils/graph_main.py\""
   },
   {
-    "name": "diff-history",
+    "name": ["diff-history", "dh"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/diff_history.py\""
   },
   {
-    "name": "dh",
-    "command": "diff-history"
-  },
-  {
-    "name": "diff-history-branch",
+    "name": ["diff-history-branch", "dhb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/diff_history_branch.py\""
   },
   {
-    "name": "dhb",
-    "command": "diff-history-branch"
-  },
-  {
-    "name": "commit-history",
+    "name": ["commit-history", "ch"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/commit_history.py\""
   },
   {
-    "name": "ch",
-    "command": "commit-history"
-  },
-  {
-    "name": "commit-history-branch",
+    "name": ["commit-history-branch", "chb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/commit_history_branch.py\""
   },
   {
-    "name": "chb",
-    "command": "commit-history-branch"
-  },
-  {
-    "name": "temp-commit",
+    "name": ["temp-commit", "tc"],
     "command": "git commit --no-verify -m \"temp\""
   },
   {
-    "name": "tc",
-    "command": "temp-commit"
-  },
-  {
-    "name": "grep-history-branch",
+    "name": ["grep-history-branch", "grephb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/grep_history.py\" --branch"
   },
   {
-    "name": "grephb",
-    "command": "grep-history-branch"
-  },
-  {
-    "name": "grep-history",
+    "name": ["grep-history", "greph"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/grep_history.py\""
   },
   {
-    "name": "greph",
-    "command": "grep-history"
-  },
-  {
-    "name": "grep-commit-branch",
+    "name": ["grep-commit-branch", "grepcb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/grep_commit.py\" --branch"
   },
   {
-    "name": "grepcb",
-    "command": "grep-commit-branch"
-  },
-  {
-    "name": "grep-commit",
+    "name": ["grep-commit", "grepc"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/grep_commit.py\""
-  },
-  {
-    "name": "grepc",
-    "command": "grep-commit"
   },
   {
     "name": "fixup",
@@ -148,12 +92,8 @@
     "command": "python3 \"$DOTFILES_DIR/git-utils/diff_origin.py\""
   },
   {
-    "name": "get-commit-version",
+    "name": ["get-commit-version", "gcv"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/commit_version.py\" $(select-commit)"
-  },
-  {
-    "name": "gcv",
-    "command": "get-commit-version"
   },
   {
     "name": "git-checkout",
@@ -164,11 +104,7 @@
     "command": "python3 \"$DOTFILES_DIR/git-utils/delete_stale_branches.py\""
   },
   {
-    "name": "list-my-branches",
+    "name": ["list-my-branches", "lmb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/list_my_branches.py\""
-  },
-  {
-    "name": "lmb",
-    "command": "list-my-branches"
   }
 ]
