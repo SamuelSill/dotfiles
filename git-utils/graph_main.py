@@ -4,6 +4,7 @@
 import sys
 import subprocess
 from git import Repo
+from git_utils import get_main_ref
 
 
 def main():
@@ -11,8 +12,7 @@ def main():
         repo = Repo(search_parent_directories=True)
 
         # Get main branch
-        origin = repo.remotes.origin
-        main_ref = origin.refs.HEAD.reference
+        main_ref = get_main_ref(repo)
         main_branch = main_ref.name
 
         # Use git log with custom format

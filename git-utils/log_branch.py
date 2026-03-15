@@ -5,6 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
+from git_utils import get_merge_base
 
 
 def main():
@@ -15,27 +16,20 @@ def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Get current branch
-        current_branch = repo.active_branch
-
-        # Get main branch
-        origin = repo.remotes.origin
-        main_ref = origin.refs.HEAD.reference
-
-        # Find merge base
-        merge_base = repo.merge_base(current_branch, main_ref)
+        # Get merge base (with fallback for shallow clones)
+        merge_base = get_merge_base(repo)
         if not merge_base:
-            print("Error: Could not find merge base", file=sys.stderr)
+            print("Error: Could not find merge base or root commit", file=sys.stderr)
             return 1
 
         # If additional arguments provided, pass them to git log
         if args.git_log_args:
             # Use git command directly to support all git log options
-            revision_range = f"{merge_base[0].hexsha}.."
+            revision_range = f"{merge_base.hexsha}.."
             subprocess.run(['git', 'log', revision_range] + args.git_log_args, cwd=repo.working_dir)
         else:
             # Default format
-            subprocess.run(['git', 'log', '--oneline', f'{merge_base[0].hexsha}..'], cwd=repo.working_dir)
+            subprocess.run(['git', 'log', '--oneline', f'{merge_base.hexsha}..'], cwd=repo.working_dir)
 
         return 0
     except Exception as e:

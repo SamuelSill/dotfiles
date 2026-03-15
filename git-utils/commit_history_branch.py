@@ -5,20 +5,17 @@ import sys
 import subprocess
 from git import Repo
 from select_file import select_file
+from git_utils import get_merge_base
 
 
 def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Get merge base
-        current_branch = repo.active_branch
-        origin = repo.remotes.origin
-        main_ref = origin.refs.HEAD.reference
-        merge_base = repo.merge_base(current_branch, main_ref)
-
+        # Get merge base (with fallback for shallow clones)
+        merge_base = get_merge_base(repo)
         if not merge_base:
-            print("Error: Could not find merge base", file=sys.stderr)
+            print("Error: Could not find merge base or root commit", file=sys.stderr)
             return 1
 
         # Select a file interactively
@@ -28,7 +25,7 @@ def main():
             return 0
 
         # Show commits affecting the file in current branch
-        subprocess.run(['git', 'log', '--oneline', f'{merge_base[0].hexsha}..', '--', selected_file], cwd=repo.working_dir)
+        subprocess.run(['git', 'log', '--oneline', f'{merge_base.hexsha}..', '--', selected_file], cwd=repo.working_dir)
         return 0
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

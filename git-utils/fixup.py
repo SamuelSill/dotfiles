@@ -15,7 +15,7 @@ def main():
             return 0
 
         # Create fixup commit
-        subprocess.run(['git', 'commit', f'--fixup={commit_hash}'], check=True)
+        subprocess.run(['git', 'commit', f'--fixup={commit_hash}', '--no-verify'], check=True)
 
         # Rebase with autosquash
         parent_hash = f'{commit_hash}~1'

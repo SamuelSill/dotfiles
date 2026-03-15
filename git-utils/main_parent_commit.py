@@ -3,26 +3,20 @@
 
 import sys
 from git import Repo
+from git_utils import get_merge_base
 
 
 def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Get current branch
-        current_branch = repo.active_branch
-
-        # Get main branch
-        origin = repo.remotes.origin
-        main_ref = origin.refs.HEAD.reference
-
-        # Find merge base
-        merge_base = repo.merge_base(current_branch, main_ref)
+        # Get merge base (with fallback for shallow clones)
+        merge_base = get_merge_base(repo)
         if merge_base:
-            print(merge_base[0].hexsha)
+            print(merge_base.hexsha)
             return 0
         else:
-            print("Error: Could not find merge base", file=sys.stderr)
+            print("Error: Could not find merge base or root commit", file=sys.stderr)
             return 1
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

@@ -3,15 +3,18 @@
 
 import sys
 from git import Repo
+from git_utils import get_main_ref
 
 
 def get_main_branch(repo: Repo):
-    # Get the symbolic reference for origin/HEAD
-    origin = repo.remotes.origin
-    # The origin HEAD reference points to the main branch
-    main_ref = origin.refs.HEAD.reference
-    # Extract just the branch name (without 'origin/')
-    return main_ref.name.replace('origin/', '')
+    try:
+        main_ref = get_main_ref(repo)
+        # Extract just the branch name (without 'origin/')
+        return main_ref.name.replace('origin/', '')
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        print("Falling back to 'main' as the default main branch name", file=sys.stderr)
+        return "main"
 
 
 def main():

@@ -5,6 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
+from git_utils import get_merge_base
 
 
 def main():
@@ -22,16 +23,12 @@ def main():
         # Select a commit using the appropriate selector
         if branch_only:
             # Select from current branch
-            current_branch = repo.active_branch
-            origin = repo.remotes.origin
-            main_ref = origin.refs.HEAD.reference
-            merge_base = repo.merge_base(current_branch, main_ref)
-
+            merge_base = get_merge_base(repo)
             if not merge_base:
-                print("Error: Could not find merge base", file=sys.stderr)
+                print("Error: Could not find merge base or root commit", file=sys.stderr)
                 return 1
 
-            revision_range = f"{merge_base[0].hexsha}.."
+            revision_range = f"{merge_base.hexsha}.."
             commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)', revision_range)
         else:
             # Select from all commits
