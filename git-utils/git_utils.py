@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Git utility functions."""
 
+import sys
+import subprocess
 from typing import Optional
 from git import Repo
 from git.objects import Commit
@@ -22,10 +24,7 @@ def get_main_ref(repo: Repo) -> Reference:
 
 
 def get_merge_base(repo: Repo, branch=None, main_ref=None) -> Optional[Commit]:
-    """Get the merge base between a branch and main, with fallback for shallow clones.
-
-    For shallow/--no-history clones where merge_base may not exist,
-    falls back to the root commit of the available history.
+    """Get the merge base between a branch and main.
 
     Args:
         repo: The git repository
@@ -33,7 +32,7 @@ def get_merge_base(repo: Repo, branch=None, main_ref=None) -> Optional[Commit]:
         main_ref: The main branch reference (defaults to get_main_ref result)
 
     Returns:
-        The merge base commit, or the root commit as fallback
+        The merge base commit, or None if no common ancestor exists
     """
     if branch is None:
         branch = repo.active_branch
@@ -44,9 +43,36 @@ def get_merge_base(repo: Repo, branch=None, main_ref=None) -> Optional[Commit]:
     if merge_base:
         return merge_base[0]
 
-    # Fallback for shallow clones: find the root commit of available history
-    # This gives us all available commits on the branch
-    root_commit = None
-    for commit in repo.iter_commits(branch):
-        root_commit = commit
-    return root_commit
+    return None
+
+
+def select_start_commit(repo: Repo) -> Optional[Commit]:
+    """Fallback: let the user pick a starting commit via fzf.
+
+    Used when merge-base detection fails (e.g., disconnected histories).
+    """
+    print("Could not detect branch start automatically. "
+          "Please select the starting commit.", file=sys.stderr)
+
+    commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)')
+    if not commits:
+        return None
+
+    try:
+        proc = subprocess.Popen(
+            ['fzf', '--height=40%', '--border', '--ansi',
+             '--preview', 'echo {} | cut -d" " -f1 | xargs git show --color=always --stat'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=None,
+            text=True
+        )
+        output, _ = proc.communicate(input=commits)
+
+        if proc.returncode == 0 and output:
+            commit_hash = output.strip().split(' ')[0]
+            return repo.commit(commit_hash)
+    except FileNotFoundError:
+        print("Error: fzf not found. Please install fzf.", file=sys.stderr)
+
+    return None

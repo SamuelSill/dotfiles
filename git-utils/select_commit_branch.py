@@ -11,15 +11,17 @@ def select_commit_branch():
     """Select a commit from the current branch using fzf. Returns the commit hash or None."""
     repo = Repo(search_parent_directories=True)
 
-    # Get merge base (with fallback for shallow clones)
+    # Get merge base to scope commits to current branch
     merge_base = get_merge_base(repo)
-    if not merge_base:
-        print("Error: Could not find merge base or root commit", file=sys.stderr)
-        return None
 
-    # Get formatted commit list
-    revision_range = f"{merge_base.hexsha}.."
-    commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)', revision_range)
+    if merge_base:
+        revision_range = f"{merge_base.hexsha}.."
+        commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)', revision_range)
+    else:
+        # Fallback: show all commits when branch start can't be detected
+        print("Could not detect branch start automatically. "
+              "Showing all commits.", file=sys.stderr)
+        commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)')
 
     if not commits:
         return None

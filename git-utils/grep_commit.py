@@ -5,7 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
-from git_utils import get_merge_base
+from git_utils import get_merge_base, select_start_commit
 
 
 def main():
@@ -25,7 +25,9 @@ def main():
             # Select from current branch
             merge_base = get_merge_base(repo)
             if not merge_base:
-                print("Error: Could not find merge base or root commit", file=sys.stderr)
+                merge_base = select_start_commit(repo)
+            if not merge_base:
+                print("Error: No commit selected", file=sys.stderr)
                 return 1
 
             revision_range = f"{merge_base.hexsha}.."

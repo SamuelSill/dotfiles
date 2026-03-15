@@ -5,7 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
-from git_utils import get_merge_base
+from git_utils import get_merge_base, select_start_commit
 
 
 def main():
@@ -24,10 +24,12 @@ def main():
             # Get current branch
             current_branch = repo.active_branch
 
-            # Get merge base (with fallback for shallow clones)
+            # Get merge base (with fallback to fzf selection)
             merge_base = get_merge_base(repo)
             if not merge_base:
-                print("Error: Could not find merge base or root commit", file=sys.stderr)
+                merge_base = select_start_commit(repo)
+            if not merge_base:
+                print("Error: No commit selected", file=sys.stderr)
                 return 1
 
             # Search only in current branch commits
