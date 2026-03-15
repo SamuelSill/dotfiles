@@ -3,19 +3,16 @@
 
 import sys
 from git import Repo
-from git_utils import get_merge_base, select_start_commit
+from git_utils import get_branch_base
 
 
 def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Get merge base (with fallback to fzf selection)
-        merge_base = get_merge_base(repo)
-        if not merge_base:
-            merge_base = select_start_commit(repo)
-        if merge_base:
-            print(merge_base.hexsha)
+        base = get_branch_base(repo)
+        if base:
+            print(base)
             return 0
         else:
             print("Error: No commit selected", file=sys.stderr)

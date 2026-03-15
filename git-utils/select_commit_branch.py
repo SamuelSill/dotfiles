@@ -4,23 +4,20 @@
 import sys
 import subprocess
 from git import Repo
-from git_utils import get_merge_base
+from git_utils import get_branch_base
 
 
 def select_commit_branch():
     """Select a commit from the current branch using fzf. Returns the commit hash or None."""
     repo = Repo(search_parent_directories=True)
 
-    # Get merge base to scope commits to current branch
-    merge_base = get_merge_base(repo)
+    # Get branch base to scope commits to current branch
+    base = get_branch_base(repo)
 
-    if merge_base:
-        revision_range = f"{merge_base.hexsha}.."
-        commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)', revision_range)
+    if base:
+        commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)', f'{base}..')
     else:
-        # Fallback: show all commits when branch start can't be detected
-        print("Could not detect branch start automatically. "
-              "Showing all commits.", file=sys.stderr)
+        # Fallback: show all commits when nothing was selected
         commits = repo.git.log('--abbrev-commit', '--pretty=format:%h %s (%ci)')
 
     if not commits:
@@ -28,7 +25,6 @@ def select_commit_branch():
 
     # Use fzf to select a commit
     try:
-        # Run fzf with proper terminal interaction
         proc = subprocess.Popen(
             ['fzf', '--height=40%', '--border', '--ansi',
              '--preview', 'echo {} | cut -d" " -f1 | xargs git show --color=always --stat'],
@@ -41,7 +37,6 @@ def select_commit_branch():
         output, _ = proc.communicate(input=commits)
 
         if proc.returncode == 0 and output:
-            # Extract just the commit hash (first field)
             commit_hash = output.strip().split(' ')[0]
             return commit_hash
     except FileNotFoundError:

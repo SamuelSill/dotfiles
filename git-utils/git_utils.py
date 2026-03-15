@@ -76,3 +76,26 @@ def select_start_commit(repo: Repo) -> Optional[Commit]:
         print("Error: fzf not found. Please install fzf.", file=sys.stderr)
 
     return None
+
+
+def get_branch_base(repo: Repo) -> Optional[str]:
+    """Get a revision suitable for use as a range start (excluded from `base..`).
+
+    Returns the merge-base commit hash, or if that fails, asks the user to pick
+    the first branch commit via fzf and returns its parent (so the selected commit
+    is included in a `base..` range).
+
+    Returns None if nothing was selected. Returns '--root' if the selected commit
+    has no parents.
+    """
+    merge_base = get_merge_base(repo)
+    if merge_base:
+        return merge_base.hexsha
+
+    selected = select_start_commit(repo)
+    if not selected:
+        return None
+
+    if selected.parents:
+        return selected.parents[0].hexsha
+    return '--root'

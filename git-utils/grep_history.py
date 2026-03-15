@@ -5,7 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
-from git_utils import get_merge_base, select_start_commit
+from git_utils import get_branch_base
 
 
 def main():
@@ -21,24 +21,15 @@ def main():
         repo = Repo(search_parent_directories=True)
 
         if branch_only:
-            # Get current branch
             current_branch = repo.active_branch
-
-            # Get merge base (with fallback to fzf selection)
-            merge_base = get_merge_base(repo)
-            if not merge_base:
-                merge_base = select_start_commit(repo)
-            if not merge_base:
+            base = get_branch_base(repo)
+            if not base:
                 print("Error: No commit selected", file=sys.stderr)
                 return 1
-
-            # Search only in current branch commits
-            revision_range = f'{merge_base.hexsha}..{current_branch.commit.hexsha}'
+            revision_range = f'{base}..{current_branch.commit.hexsha}'
         else:
-            # Search in all commits
             revision_range = None
 
-        # Use git log with -G to find commits that changed the pattern
         if revision_range:
             subprocess.run(['git', 'log', '--oneline', f'-G{pattern}', revision_range], cwd=repo.working_dir)
         else:

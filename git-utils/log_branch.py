@@ -5,7 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
-from git_utils import get_merge_base, select_start_commit
+from git_utils import get_branch_base
 
 
 def main():
@@ -16,22 +16,16 @@ def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Get merge base (with fallback to fzf selection)
-        merge_base = get_merge_base(repo)
-        if not merge_base:
-            merge_base = select_start_commit(repo)
-        if not merge_base:
+        base = get_branch_base(repo)
+        if not base:
             print("Error: No commit selected", file=sys.stderr)
             return 1
 
-        # If additional arguments provided, pass them to git log
+        revision_range = f"{base}.."
         if args.git_log_args:
-            # Use git command directly to support all git log options
-            revision_range = f"{merge_base.hexsha}.."
             subprocess.run(['git', 'log', revision_range] + args.git_log_args, cwd=repo.working_dir)
         else:
-            # Default format
-            subprocess.run(['git', 'log', '--oneline', f'{merge_base.hexsha}..'], cwd=repo.working_dir)
+            subprocess.run(['git', 'log', '--oneline', revision_range], cwd=repo.working_dir)
 
         return 0
     except Exception as e:

@@ -5,7 +5,7 @@ import sys
 import argparse
 import subprocess
 from git import Repo
-from git_utils import get_merge_base, select_start_commit
+from git_utils import get_branch_base
 
 
 def main():
@@ -20,20 +20,14 @@ def main():
     try:
         repo = Repo(search_parent_directories=True)
 
-        # Select a commit using the appropriate selector
         if branch_only:
-            # Select from current branch
-            merge_base = get_merge_base(repo)
-            if not merge_base:
-                merge_base = select_start_commit(repo)
-            if not merge_base:
+            base = get_branch_base(repo)
+            if not base:
                 print("Error: No commit selected", file=sys.stderr)
                 return 1
-
-            revision_range = f"{merge_base.hexsha}.."
+            revision_range = f"{base}.."
             commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)', revision_range)
         else:
-            # Select from all commits
             commits = repo.git.log('--abbrev-commit', '--pretty=format:%H %s (%ci)')
 
         if not commits:
@@ -41,13 +35,12 @@ def main():
 
         # Use fzf to select a commit
         try:
-            # Run fzf with proper terminal interaction
             proc = subprocess.Popen(
                 ['fzf', '--height=40%', '--border', '--ansi',
                  '--preview', 'echo {} | cut -d" " -f1 | xargs git show --color=always --stat'],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                stderr=None,  # Let stderr go to terminal
+                stderr=None,
                 text=True
             )
 
@@ -56,10 +49,7 @@ def main():
             if proc.returncode == 0 and output:
                 commit_hash = output.strip().split(' ')[0]
 
-                # Show the commit and grep for the pattern
-                # Use git show piped to grep for pattern matching with context
                 try:
-                    # Try using grep command
                     git_show = subprocess.Popen(
                         ['git', 'show', commit_hash],
                         stdout=subprocess.PIPE,
@@ -71,7 +61,6 @@ def main():
                     )
                     git_show.wait()
                 except FileNotFoundError:
-                    # Fallback: show full commit if grep not available
                     subprocess.run(['git', 'show', commit_hash], cwd=repo.working_dir)
 
                 return 0
