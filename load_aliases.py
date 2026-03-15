@@ -11,14 +11,28 @@ from pathlib import Path
 
 def create_alias_command(name, command, shell_type):
     """Create an alias/function command for the specified shell type."""
+    import re
     if shell_type == 'sh':
-        # Use functions instead of aliases for better syntax highlighting
-        # Functions are validated by name only, not by content
         cmd_escaped = command.replace("'", "'\\''")
+
+        # Check if command starts with its own name (e.g., claude -> claude --settings)
+        # Use alias in this case since aliases have built-in recursion protection
+        cmd_first_word = re.split(r'\s', command.strip())[0]
+        if cmd_first_word == name:
+            return f"alias {name}='{cmd_escaped}'"
+
+        # Use functions for better syntax highlighting
+        # If command doesn't already handle args ($@, $1, etc), append "$@"
+        if not re.search(r'\$[@\d]', command):
+            cmd_escaped = f'{cmd_escaped} "$@"'
         return f"{name}() {{ {cmd_escaped}; }}"
     elif shell_type == 'powershell':
-        # Create a function that invokes the command
         cmd_escaped = command.replace('"', '`"')
+        # Check if command starts with its own name - add .exe suffix to avoid recursion
+        cmd_first_word = re.split(r'\s', command.strip())[0]
+        if cmd_first_word == name:
+            rest_of_cmd = command[len(name):].replace('"', '`"')
+            return f"function global:{name} {{ & {name}.exe{rest_of_cmd} }}"
         return f"function global:{name} {{ Invoke-Expression '{cmd_escaped}' }}"
     else:
         raise ValueError(f"Unknown shell type: {shell_type}")
