@@ -5,8 +5,26 @@ Utility to load aliases from aliases.json and output shell-specific alias comman
 import argparse
 import json
 import sys
-import os
+import platform
 from pathlib import Path
+
+PLATFORM_KEY = {
+    'Darwin': 'mac',
+    'Linux': 'linux',
+    'Windows': 'windows',
+}
+
+
+def resolve_command(command):
+    """Resolve a command that may be a string or a dict mapping OS to command."""
+    if isinstance(command, str):
+        return command
+    current_os = PLATFORM_KEY.get(platform.system())
+    if current_os and current_os in command:
+        return command[current_os]
+    if 'default' in command:
+        return command['default']
+    raise ValueError(f"No command for platform '{platform.system()}' and no 'default' provided")
 
 
 def create_alias_command(name, command, shell_type):
@@ -43,7 +61,7 @@ def generate_aliases(aliases, shell_type):
     commands = []
     for alias_def in aliases:
         names = alias_def['name']
-        cmd = alias_def['command']
+        cmd = resolve_command(alias_def['command'])
         # Support both string and array for "name"
         if isinstance(names, str):
             names = [names]
