@@ -25,7 +25,7 @@
   },
   {
     "name": ["interactive-rebase", "ir"],
-    "command": "git rebase -i $(main-parent-commit)"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/interactive_rebase.py\""
   },
   {
     "name": "graph1",
@@ -93,7 +93,7 @@
   },
   {
     "name": ["get-commit-version", "gcv"],
-    "command": "python3 \"$DOTFILES_DIR/git-utils/commit_version.py\" $(select-commit)"
+    "command": "python3 \"$DOTFILES_DIR/git-utils/commit_version.py\""
   },
   {
     "name": "git-checkout",

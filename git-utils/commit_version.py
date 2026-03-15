@@ -2,16 +2,14 @@
 """Get the closest version tag of a commit."""
 
 import sys
-import argparse
+from select_commit import select_commit
 from git import Repo
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Get the closest version tag of a commit.')
-    parser.add_argument('commit_hash', help='Commit hash to check')
-    args = parser.parse_args()
-
-    commit_hash = args.commit_hash
+    commit_hash = select_commit()
+    if not commit_hash:
+        return 0
 
     try:
         repo = Repo(search_parent_directories=True)
