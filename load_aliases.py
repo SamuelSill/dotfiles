@@ -45,11 +45,17 @@ def create_alias_command(name, command, shell_type):
             cmd_escaped = f'{cmd_escaped} "$@"'
         return f"{name}() {{ {cmd_escaped}; }}"
     elif shell_type == 'powershell':
-        cmd_escaped = command.replace('"', '`"')
+        # Translate shell arg references to PowerShell equivalents
+        ps_command = re.sub(r'\$@', '$args', command)
+        ps_command = re.sub(r'\$(\d+)', lambda m: f'$args[{int(m.group(1)) - 1}]', ps_command)
+        # If command doesn't already handle args, append $args
+        if not re.search(r'\$[@\d]', command):
+            ps_command = f'{ps_command} $args'
+        cmd_escaped = ps_command.replace('"', '`"')
         # Check if command starts with its own name - add .exe suffix to avoid recursion
         cmd_first_word = re.split(r'\s', command.strip())[0]
         if cmd_first_word == name:
-            rest_of_cmd = command[len(name):].replace('"', '`"')
+            rest_of_cmd = ps_command[len(name):].replace('"', '`"')
             return f"function global:{name} {{ & {name}.exe{rest_of_cmd} }}"
         return f"function global:{name} {{ Invoke-Expression '{cmd_escaped}' }}"
     else:
