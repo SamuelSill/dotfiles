@@ -106,5 +106,9 @@
   {
     "name": ["list-my-branches", "lmb"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/list_my_branches.py\""
+  },
+  {
+    "name": ["reset-to-origin", "rto"],
+    "command": "python3 \"$DOTFILES_DIR/git-utils/reset_to_origin.py\""
   }
 ]
