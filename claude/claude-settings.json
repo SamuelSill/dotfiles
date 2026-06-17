@@ -22,7 +22,7 @@
   "effortLevel": "medium",
   "statusLine": {
     "type": "command",
-    "command": ". ${DOTFILES_DIR}/claude-settings/statusline.sh",
+    "command": ". ${DOTFILES_DIR}/claude/statusline.sh",
     "padding": 2
   }
 }

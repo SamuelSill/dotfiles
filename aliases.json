@@ -113,6 +113,6 @@
   },
   {
     "name": "claude",
-    "command": "claude --settings \"$DOTFILES_DIR/claude/claude-settings.json\" --enable-auto-mode $@"
+    "command": "python3 \"$DOTFILES_DIR/claude/run_claude.py\" $@"
   }
 ]
