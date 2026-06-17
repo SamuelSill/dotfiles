@@ -110,5 +110,9 @@
   {
     "name": ["reset-to-origin", "rto"],
     "command": "python3 \"$DOTFILES_DIR/git-utils/reset_to_origin.py\""
+  },
+  {
+    "name": "claude",
+    "command": "claude --settings \"$DOTFILES_DIR/claude/claude-settings.json\" --enable-auto-mode $@"
   }
 ]

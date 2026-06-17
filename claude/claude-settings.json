@@ -1,0 +1,28 @@
+{
+  "model": "opus",
+  "extraKnownMarketplaces": {
+    "ai-tools": {
+      "source": {
+        "source": "github",
+        "repo": "SamuelSill/ai-tools"
+      }
+    },
+    "plannotator": {
+      "source": {
+        "source": "github",
+        "repo": "backnotprop/plannotator"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true,
+    "pr@ai-tools": true,
+    "plannotator@plannotator": true
+  },
+  "effortLevel": "medium",
+  "statusLine": {
+    "type": "command",
+    "command": ". ${DOTFILES_DIR}/claude-settings/statusline.sh",
+    "padding": 2
+  }
+}

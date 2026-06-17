@@ -3,6 +3,16 @@
 # Note: This file contains shell-agnostic configurations.
 # It detects the current shell and sources appropriate configs.
 
+# Set DOTFILES_DIR
+if [ -n "$BASH_VERSION" ]; then
+    DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+elif [ -n "$ZSH_VERSION" ]; then
+    DOTFILES_DIR="${0:A:h}"
+else
+    DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+fi
+export DOTFILES_DIR
+
 # Detect current shell
 current_shell=$(basename "$SHELL")
 
