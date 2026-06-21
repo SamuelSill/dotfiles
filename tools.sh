@@ -58,3 +58,5 @@ if command -v gh >/dev/null 2>&1; then
             ;;
     esac
 fi
+
+cp -r $DOTFILES_DIR/.config ~/.config/
