@@ -8,6 +8,8 @@ from select_commit_branch import select_commit_branch
 
 def main():
     try:
+        no_verify = '--no-verify' in sys.argv[1:]
+
         # Select a commit from the current branch
         commit_hash = select_commit_branch()
 
@@ -15,7 +17,10 @@ def main():
             return 0
 
         # Create fixup commit
-        subprocess.run(['git', 'commit', f'--fixup={commit_hash}'], check=True)
+        commit_cmd = ['git', 'commit', f'--fixup={commit_hash}']
+        if no_verify:
+            commit_cmd.append('--no-verify')
+        subprocess.run(commit_cmd, check=True)
 
         # Rebase with autosquash
         parent_hash = f'{commit_hash}~1'
