@@ -145,10 +145,10 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
-        bind "Alt left" { MoveFocusOrTab "left"; }
-        bind "Alt down" { MoveFocus "down"; }
-        bind "Alt up" { MoveFocus "up"; }
-        bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Alt h" { MoveFocusOrTab "left"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
         bind "Alt =" { Resize "Increase"; }
@@ -156,14 +156,13 @@ keybinds clear-defaults=true {
         bind "Alt ]" { NextSwapLayout; }
         bind "Alt f" { ToggleFloatingPanes; }
         bind "Ctrl g" { SwitchToMode "locked"; }
-        bind "Alt h" { MoveFocusOrTab "left"; }
-        bind "Alt i" { MoveTab "left"; }
-        bind "Alt j" { MoveFocus "down"; }
-        bind "Alt k" { MoveFocus "up"; }
-        bind "Alt l" { MoveFocusOrTab "right"; }
-        bind "Alt n" { TogglePaneInGroup; }
         bind "Alt o" { MoveTab "right"; }
-        bind "Alt p" { NewPane "stacked"; SwitchToMode "normal"; }
+        bind "Alt p" { NewPane; }
+        bind "Ctrl S" { NewPane "stacked"; SwitchToMode "normal"; }
+        bind "Ctrl J" { NewPane "down"; SwitchToMode "normal"; }
+        bind "Ctrl K" { NewPane "up"; SwitchToMode "normal"; }
+        bind "Ctrl L" { NewPane "right"; SwitchToMode "normal"; }
+        bind "Ctrl H" { NewPane "left"; SwitchToMode "normal"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Alt t" { NewTab; }
         bind "Alt w" { CloseFocus; }
@@ -414,7 +413,7 @@ copy_command "wl-copy"                    // wayland
  
 // Path to the default editor to use to edit pane scrollbuffer
 // Default: $EDITOR or $VISUAL
-// scrollback_editor "/usr/bin/vim"
+// scrollback_editor "/usr/bin/code"
  
 // A fixed name to always give the Zellij session.
 // Consider also setting `attach_to_session true,`
