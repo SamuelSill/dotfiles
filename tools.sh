@@ -47,16 +47,5 @@ case "$current_shell" in
         ;;
 esac
 
-# Setup gh-copilot (detect shell)
-if command -v gh >/dev/null 2>&1; then
-    case "$current_shell" in
-        zsh)
-            eval "$(gh copilot alias -- zsh)"
-            ;;
-        bash)
-            eval "$(gh copilot alias -- bash)"
-            ;;
-    esac
-fi
-
 cp -r "$DOTFILES_DIR/.config/." ~/.config/
+
