@@ -84,6 +84,8 @@ keybinds clear-defaults=true {
         bind "j" { MovePane "down"; }
         bind "k" { MovePane "up"; }
         bind "l" { MovePane "right"; }
+        bind "," { MoveTab "left"; }
+        bind "." { MoveTab "right"; }
         bind "n" { MovePane; }
         bind "p" { MovePaneBackwards; }
         bind "tab" { MovePane; }
@@ -122,6 +124,7 @@ keybinds clear-defaults=true {
             SwitchToMode "normal"
         }
         bind "Ctrl o" { SwitchToMode "normal"; }
+        bind "d" { Detach; }
         bind "p" {
             LaunchOrFocusPlugin "plugin-manager" {
                 floating true
@@ -145,6 +148,7 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
+        bind "Alt f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
         bind "Alt h" { MoveFocusOrTab "left"; }
         bind "Alt j" { MoveFocus "down"; }
         bind "Alt k" { MoveFocus "up"; }
@@ -154,17 +158,9 @@ keybinds clear-defaults=true {
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
-        bind "Alt f" { ToggleFloatingPanes; }
         bind "Ctrl g" { SwitchToMode "locked"; }
-        bind "Alt o" { MoveTab "right"; }
-        bind "Alt p" { NewPane; }
-        bind "Ctrl S" { NewPane "stacked"; SwitchToMode "normal"; }
-        bind "Ctrl J" { NewPane "down"; SwitchToMode "normal"; }
-        bind "Ctrl K" { NewPane "up"; SwitchToMode "normal"; }
-        bind "Ctrl L" { NewPane "right"; SwitchToMode "normal"; }
-        bind "Ctrl H" { NewPane "left"; SwitchToMode "normal"; }
+        bind "Alt n" { SwitchToMode "tmux"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
-        bind "Alt t" { NewTab; }
         bind "Alt w" { CloseFocus; }
         bind "Ctrl q" { Quit; }
     }
@@ -173,9 +169,6 @@ keybinds clear-defaults=true {
     }
     shared_except "locked" "session" {
         bind "Ctrl o" { SwitchToMode "session"; }
-    }
-    shared_except "locked" "scroll" "search" "tmux" {
-        bind "Ctrl b" { SwitchToMode "tmux"; }
     }
     shared_except "locked" "scroll" "search" {
         bind "Ctrl s" { SwitchToMode "scroll"; }
@@ -230,29 +223,15 @@ keybinds clear-defaults=true {
     renamepane {
         bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
     }
-    shared_among "session" "tmux" {
-        bind "d" { Detach; }
-    }
+    // Repurposed "tmux" mode slot as a "create" section (entered via Alt n).
+    // Note: zellij has a fixed set of modes, so the status bar still labels this "TMUX".
     tmux {
-        bind "left" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "down" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "up" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "right" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "space" { NextSwapLayout; }
-        bind "\"" { NewPane "down"; SwitchToMode "normal"; }
-        bind "%" { NewPane "right"; SwitchToMode "normal"; }
-        bind "," { SwitchToMode "renametab"; }
-        bind "[" { SwitchToMode "scroll"; }
-        bind "Ctrl b" { Write 2; SwitchToMode "normal"; }
-        bind "c" { NewTab; SwitchToMode "normal"; }
-        bind "h" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "l" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "n" { GoToNextTab; SwitchToMode "normal"; }
-        bind "o" { FocusNextPane; }
-        bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
-        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
+        bind "h" { NewPane "left"; SwitchToMode "normal"; }
+        bind "j" { NewPane "down"; SwitchToMode "normal"; }
+        bind "k" { NewPane "up"; SwitchToMode "normal"; }
+        bind "l" { NewPane "right"; SwitchToMode "normal"; }
+        bind "t" { NewTab; SwitchToMode "normal"; }
     }
 }
 
