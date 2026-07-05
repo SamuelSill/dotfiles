@@ -15,24 +15,45 @@ import sys
 import tempfile
 from pathlib import Path
 
-SETTINGS_PATH = Path(__file__).resolve().parent / "claude-settings.json"
+HERE = Path(__file__).resolve().parent
+SETTINGS_PATH = HERE / "claude-settings.json"
+
+# Deployment-specific MCP servers (with their auth tokens) live outside this
+# shared repo. An environment defining CLAUDE_MCP_CONFIG points us at its MCP
+# config file; when unset or missing we simply launch without it.
+_MCP_CONFIG_ENV = os.environ.get("CLAUDE_MCP_CONFIG")
+MCP_CONFIG_PATH = Path(_MCP_CONFIG_ENV) if _MCP_CONFIG_ENV else None
+
+
+def expand_to_tempfile(src: Path, prefix: str) -> str:
+    """Write an env-var-expanded copy of `src` to a temp file, return its path."""
+    fd, tmp_path = tempfile.mkstemp(suffix=".json", prefix=prefix)
+    with os.fdopen(fd, "w") as f:
+        f.write(os.path.expandvars(src.read_text()))
+    return tmp_path
 
 
 def main():
-    expanded = os.path.expandvars(SETTINGS_PATH.read_text())
-
-    fd, tmp_path = tempfile.mkstemp(suffix=".json", prefix="claude-settings-")
+    tmp_files = []
     try:
-        with os.fdopen(fd, "w") as f:
-            f.write(expanded)
+        settings_tmp = expand_to_tempfile(SETTINGS_PATH, "claude-settings-")
+        tmp_files.append(settings_tmp)
 
         # shutil.which resolves the real executable (incl. .cmd/.exe on Windows),
         # avoiding any recursion with the shell alias named "claude".
         claude = shutil.which("claude") or "claude"
-        cmd = [claude, "--settings", tmp_path, "--enable-auto-mode", *sys.argv[1:]]
+        cmd = [claude, "--settings", settings_tmp, "--enable-auto-mode"]
+
+        if MCP_CONFIG_PATH and MCP_CONFIG_PATH.exists():
+            mcp_tmp = expand_to_tempfile(MCP_CONFIG_PATH, "claude-mcp-")
+            tmp_files.append(mcp_tmp)
+            cmd += ["--mcp-config", mcp_tmp]
+
+        cmd += sys.argv[1:]
         return subprocess.call(cmd)
     finally:
-        os.unlink(tmp_path)
+        for path in tmp_files:
+            os.unlink(path)
 
 
 if __name__ == "__main__":
