@@ -1,3 +1,6 @@
 [submodule "ai-tools"]
 	path = ai-tools
 	url = https://github.com/SamuelSill/ai-tools.git
+[submodule "topbar"]
+	path = topbar
+	url = git@github.com:SamuelSill/topbar.git
