@@ -7,11 +7,7 @@ keybinds clear-defaults=true {
         bind "Ctrl g" { SwitchToMode "normal"; }
     }
     pane {
-        bind "left" { MoveFocus "left"; }
-        bind "down" { MoveFocus "down"; }
-        bind "up" { MoveFocus "up"; }
-        bind "right" { MoveFocus "right"; }
-        bind "c" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "r" { SwitchToMode "renamepane"; PaneNameInput 0; }
         bind "d" { NewPane "down"; SwitchToMode "normal"; }
         bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
@@ -23,7 +19,6 @@ keybinds clear-defaults=true {
         bind "n" { NewPane; SwitchToMode "normal"; }
         bind "p" { SwitchFocus; }
         bind "Ctrl p" { SwitchToMode "normal"; }
-        bind "r" { NewPane "right"; SwitchToMode "normal"; }
         bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
         bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
         bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
@@ -227,9 +222,9 @@ keybinds clear-defaults=true {
     // Note: zellij has a fixed set of modes, so the status bar still labels this "TMUX".
     tmux {
         bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
-        bind "h" { NewPane "left"; SwitchToMode "normal"; }
+        bind "h" { NewPane "right"; MovePane "left"; SwitchToMode "normal"; }
         bind "j" { NewPane "down"; SwitchToMode "normal"; }
-        bind "k" { NewPane "up"; SwitchToMode "normal"; }
+        bind "k" { NewPane "down"; MovePane "up"; SwitchToMode "normal"; }
         bind "l" { NewPane "right"; SwitchToMode "normal"; }
         bind "t" { NewTab; SwitchToMode "normal"; }
     }
