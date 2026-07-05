@@ -114,5 +114,9 @@
   {
     "name": "claude",
     "command": "python3 \"$DOTFILES_DIR/claude/run_claude.py\" $@"
+  },
+  {
+    "name": "vi",
+    "command": "nvim"
   }
 ]

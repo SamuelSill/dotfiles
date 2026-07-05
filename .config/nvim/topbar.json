@@ -1,0 +1,84 @@
+{
+  "_comment": "GENERAL topbar layout (shared dotfiles). An optional machine-specific layout ($NVIM_LOCAL_TOPBAR) is merged on top at load time. Edit and run :TopbarReload (no restart needed). Submenus are derived from the key sequences in 'bindings'. A leaf must be backed by a real mapping (or a native key) to actually do something.",
+
+  "triggers": ["<leader>", "g"],
+  "separator": "·",
+  "branch_marker": "›",
+  "breadcrumb_separator": "▏",
+
+  "pretty": {
+    "<leader>": "SPC",
+    "<CR>": "↵",
+    "<Tab>": "⇥",
+    "<Esc>": "ESC"
+  },
+
+  "highlights": {
+    "key":   { "link": "Function" },
+    "desc":  { "link": "Comment" },
+    "title": { "link": "Title" },
+    "sep":   { "link": "NonText" },
+    "fill":  { "link": "TabLineFill" }
+  },
+
+  "bindings": [
+    [">>", "indent"],
+    ["<<", "unindent"],
+
+    ["}", "para down"],
+    ["{", "para up"],
+    ["<A-j>", "move ↓"],
+    ["<A-k>", "move ↑"],
+
+    ["gd", "def"],
+    ["gr", "refs"],
+    ["gi", "impl"],
+    ["g[", "back"],
+    ["g]", "forward"],
+
+    ["<leader>e",  "explorer"],
+    ["<leader>q",  "quit"],
+    ["<leader>o",  "hdr/src"],
+
+    ["<leader>ff", "files"],
+    ["<leader>fg", "grep (+glob)"],
+    ["<leader>fr", "find/replace"],
+    ["<leader>fb", "open files"],
+    ["<leader>fh", "help"],
+
+    ["<leader>rn", "rename"],
+    ["<leader>?",  "all keys"],
+
+    ["<leader>gb", "blame line"],
+    ["<leader>gB", "blame inline"],
+    ["<leader>gv", "blame column"],
+    ["<leader>gl", "line history"],
+
+    ["<leader>yp", "rel path"],
+    ["<leader>yP", "full path"]
+  ],
+
+  "groups": [
+    ["g",         "goto"],
+    ["<leader>",  "menu"],
+    ["<leader>f", "find"],
+    ["<leader>r", "rename"],
+    ["<leader>g", "git"],
+    ["<leader>y", "yank"]
+  ],
+
+  "_visual_comment": "Shown in the tabline while in visual / visual-line / visual-block mode instead of the normal bindings. These are native visual-mode keys (a flat cheatsheet, no submenus).",
+  "visual": {
+    "bindings": [
+      ["u", "lowercase"],
+      ["U", "uppercase"],
+      ["~", "toggle case"],
+      [">", "indent"],
+      ["<", "unindent"],
+      ["y", "yank"],
+      ["d", "delete"],
+      ["<A-j>", "move ↓"],
+      ["<A-k>", "move ↑"]
+    ]
+  }
+}
