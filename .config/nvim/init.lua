@@ -243,6 +243,18 @@ require('lazy').setup({
   },
   { 'tpope/vim-fugitive' },
 
+  -- Merge-conflict highlighting + resolution (git-conflict) -------------------
+  -- Colors the two sides of a conflict (<<<< current / ==== / >>>> incoming)
+  -- with distinct backgrounds so the regions — not just the marker lines —
+  -- stand out, and adds :GitConflict* commands to jump between conflicts and
+  -- pick a side. default_mappings is OFF: its defaults grab `co`/`ct`, and `ct`
+  -- is the vim change-till operator; we bind our own keys in section 5 instead.
+  {
+    'akinsho/git-conflict.nvim',
+    version = '*',        -- track tagged releases, not bleeding main
+    opts = { default_mappings = false },
+  },
+
   -- Auto-close pairs: typing ( [ { ` ' " inserts the pair and puts the cursor
   -- between them. Also skips over a closing char you type yourself, deletes both
   -- halves on backspace, and is smart about quotes (won't pair a ' mid-word like
@@ -456,6 +468,9 @@ map('n', '<leader>?', tb.keymaps, { desc = 'Show all keybindings' })
 --              if uncommitted, else the commit that last touched it (msg + diff)
 -- <leader>gr : restore the line — discard working-tree changes on it (or on the
 --              visually-selected lines), reverting to the committed version
+-- ]x / [x    : jump to the next / previous merge conflict (git-conflict)
+-- <leader>gx : resolve the conflict under the cursor — o=ours, t=theirs,
+--              b=both, n=none. Conflict highlighting itself is automatic.
 map('n', '<leader>gb', function() require('gitsigns').blame_line({ full = true }) end,
   { desc = 'Blame line (popup)' })
 map('n', '<leader>gB', function() require('gitsigns').toggle_current_line_blame() end,
@@ -502,6 +517,14 @@ map('x', '<leader>gr', function()
   if s > e then s, e = e, s end
   require('gitsigns').reset_hunk({ s, e })
 end, { desc = 'Restore lines (discard changes)' })
+-- Merge conflicts (git-conflict.nvim). Highlighting is automatic in any buffer
+-- containing conflict markers; these commands only act when a conflict exists.
+map('n', ']x', '<cmd>GitConflictNextConflict<cr>', { desc = 'Next git conflict' })
+map('n', '[x', '<cmd>GitConflictPrevConflict<cr>', { desc = 'Prev git conflict' })
+map('n', '<leader>gxo', '<cmd>GitConflictChooseOurs<cr>',   { desc = 'Conflict: choose ours (current)' })
+map('n', '<leader>gxt', '<cmd>GitConflictChooseTheirs<cr>', { desc = 'Conflict: choose theirs (incoming)' })
+map('n', '<leader>gxb', '<cmd>GitConflictChooseBoth<cr>',   { desc = 'Conflict: choose both' })
+map('n', '<leader>gxn', '<cmd>GitConflictChooseNone<cr>',   { desc = 'Conflict: choose none' })
 
 --------------------------------------------------------------------------------
 -- 6. topbar: always-on shortcut bar (github.com/SamuelSill/topbar)
