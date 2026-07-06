@@ -148,6 +148,10 @@ keybinds clear-defaults=true {
         bind "Alt j" { MoveFocus "down"; }
         bind "Alt k" { MoveFocus "up"; }
         bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Ctrl Alt j" { ScrollDown; }
+        bind "Ctrl Alt k" { ScrollUp; }
+        bind "Ctrl Alt d" { HalfPageScrollDown; }
+        bind "Ctrl Alt u" { HalfPageScrollUp; }
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
         bind "Alt =" { Resize "Increase"; }
