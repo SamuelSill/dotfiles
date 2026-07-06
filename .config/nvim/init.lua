@@ -452,6 +452,10 @@ map('n', '<leader>?', tb.keymaps, { desc = 'Show all keybindings' })
 -- <leader>gB : toggle GitLens-style inline blame ghost text (follows cursor)
 -- <leader>gv : full side-by-side blame column for the whole file
 -- <leader>gl : history of the current line (or visually-selected lines)
+-- <leader>gc : last change on the line, wherever it lives — working-tree diff
+--              if uncommitted, else the commit that last touched it (msg + diff)
+-- <leader>gr : restore the line — discard working-tree changes on it (or on the
+--              visually-selected lines), reverting to the committed version
 map('n', '<leader>gb', function() require('gitsigns').blame_line({ full = true }) end,
   { desc = 'Blame line (popup)' })
 map('n', '<leader>gB', function() require('gitsigns').toggle_current_line_blame() end,
@@ -468,6 +472,36 @@ map('x', '<leader>gl', function()
   if s > e then s, e = e, s end
   vim.cmd(string.format('Git log -L %d,%d:%%', s, e))
 end, { desc = 'Line history (selection)' })
+-- Last change on the line: preview the working-tree diff if the line sits in an
+-- uncommitted hunk, otherwise blame the commit that last touched it. <leader>gb
+-- only ever does the latter and shows a bare "Not Committed Yet" for edits.
+map('n', '<leader>gc', function()
+  local gs = require('gitsigns')
+  local lnum = vim.fn.line('.')
+  for _, h in ipairs(gs.get_hunks() or {}) do
+    local first = h.added.start
+    -- A pure deletion (added.count == 0) is anchored on its start line.
+    local last = first + math.max(h.added.count, 1) - 1
+    if lnum >= first and lnum <= last then
+      gs.preview_hunk()            -- uncommitted: working-tree diff
+      return
+    end
+  end
+  gs.blame_line({ full = true })   -- committed: last commit + its diff
+end, { desc = 'Last change on line (working tree or last commit)' })
+-- Restore the current line to its committed state (discard working-tree edits).
+-- reset_hunk with a {first,last} range scopes the reset to just those lines
+-- instead of the whole hunk.
+map('n', '<leader>gr', function()
+  local l = vim.fn.line('.')
+  require('gitsigns').reset_hunk({ l, l })
+end, { desc = 'Restore line (discard changes)' })
+map('x', '<leader>gr', function()
+  local s = vim.fn.line('v')
+  local e = vim.fn.line('.')
+  if s > e then s, e = e, s end
+  require('gitsigns').reset_hunk({ s, e })
+end, { desc = 'Restore lines (discard changes)' })
 
 --------------------------------------------------------------------------------
 -- 6. topbar: always-on shortcut bar (github.com/SamuelSill/topbar)

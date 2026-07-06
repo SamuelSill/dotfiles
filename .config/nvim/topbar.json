@@ -53,6 +53,8 @@
     ["<leader>gB", "blame inline"],
     ["<leader>gv", "blame column"],
     ["<leader>gl", "line history"],
+    ["<leader>gc", "line change"],
+    ["<leader>gr", "restore line"],
 
     ["<leader>yp", "rel path"],
     ["<leader>yP", "full path"]
