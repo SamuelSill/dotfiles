@@ -1,0 +1,9 @@
+# lazygit config.
+#
+# Keep delta MINIMAL here: no --side-by-side / --line-numbers. Those reformat the
+# diff layout, which fights lazygit's hunk/line staging view. Plain delta just
+# adds syntax highlighting to an otherwise-normal unified diff.
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never
