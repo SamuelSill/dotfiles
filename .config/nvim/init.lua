@@ -61,6 +61,21 @@ opt.cursorline = true
 -- NOTE: indentation width (expandtab/shiftwidth/tabstop) is intentionally left
 -- at Neovim defaults here; project-specific styles are set in a local override.
 
+-- Strip trailing whitespace on every write. winsaveview/winrestview keep the
+-- cursor and scroll position put, and `keeppatterns` avoids stomping the last
+-- search. Skips filetypes where trailing whitespace is meaningful — diff/patch
+-- (stripping it would corrupt the file) and markdown (two trailing spaces are a
+-- hard line break).
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = vim.api.nvim_create_augroup('trim_trailing_whitespace', { clear = true }),
+  callback = function()
+    if vim.tbl_contains({ 'diff', 'patch', 'markdown' }, vim.bo.filetype) then return end
+    local view = vim.fn.winsaveview()
+    vim.cmd([[keeppatterns %s/\s\+$//e]])
+    vim.fn.winrestview(view)
+  end,
+})
+
 --------------------------------------------------------------------------------
 -- 3. Bootstrap lazy.nvim (the plugin manager) and declare plugins
 --------------------------------------------------------------------------------
