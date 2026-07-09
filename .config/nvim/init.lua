@@ -165,37 +165,11 @@ require('lazy').setup({
     },
   },
 
-  -- Fuzzy finder (VS Code Ctrl+P / Ctrl+Shift+F) ------------------------------
-  {
-    'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      -- Native C sorter. Telescope's default matcher is pure Lua and chokes
-      -- ranking huge candidate sets (a big monorepo can be ~1M files even after
-      -- .gitignore). This compiles a C fzf matcher so typing stays instant.
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-    },
-    config = function()
-      require('telescope').setup({
-        defaults = {
-          -- Rank on the file path tail first; matters when huge numbers of
-          -- paths share long common prefixes.
-          path_display = { 'filename_first' },
-        },
-        extensions = {
-          fzf = {},   -- use the native matcher with its defaults
-        },
-      })
-      require('telescope').load_extension('fzf')
-    end,
-  },
-
-  -- Fast finder for huge repos ------------------------------------------------
-  -- Telescope buffers every candidate in a Lua table and bogs down past a few
-  -- hundred thousand files. fzf-lua streams results straight through the `fzf`
-  -- binary, so file-finding stays fast on very large monorepos. We use it for
-  -- files/grep/buffers and keep Telescope for LSP pickers.
+  -- Fuzzy finder for everything (files, grep, buffers, LSP pickers) -----------
+  -- fzf-lua streams results straight through the `fzf` binary, so it stays fast
+  -- on very large monorepos (a Lua-table finder bogs down past a few hundred
+  -- thousand files). It also previews via native vim.treesitter, so it needs no
+  -- nvim-treesitter API and doesn't break against the treesitter `main` rewrite.
   {
     'ibhagwan/fzf-lua',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -456,10 +430,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local map = function(lhs, rhs, desc)
       vim.keymap.set('n', lhs, rhs, { buffer = ev.buf, desc = desc })
     end
-    local tb = require('telescope.builtin')
+    local fzf = require('fzf-lua')
     map('gd', smart_goto_definition,         'Goto definition / file under cursor')
     map('gD', vim.lsp.buf.declaration,       'Goto declaration')
-    map('gr', tb.lsp_references,             'Goto references')
+    map('gr', fzf.lsp_references,            'Goto references')
     map('gi', vim.lsp.buf.implementation,    'Goto implementation')
     map('K',  vim.lsp.buf.hover,             'Hover docs')
     map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
@@ -508,15 +482,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- 5. Global keymaps
 --------------------------------------------------------------------------------
 local map = vim.keymap.set
-local tb = require('telescope.builtin')
 local fzf = require('fzf-lua')
 
 -- Open the tree focused on the current file (reveals + jumps to it), VS Code style.
 map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (reveal current file)' })
 -- Goto file-under-cursor / definition — works in every buffer (see section 4).
 map('n', 'gd', smart_goto_definition, { desc = 'Goto definition / file under cursor' })
--- File/grep/buffer pickers use fzf-lua (fast on huge trees); Telescope stays
--- for LSP pickers (gr references) and help/keymaps.
+-- All pickers use fzf-lua — files/grep/buffers plus LSP (gr references,
+-- implementors) and help/keymaps.
 -- Find-files with recently-visited files floated to the top: prepend this cwd's
 -- entries from :oldfiles (most-recent first, existing only) to the streamed `fd`
 -- list, dedupe (recents win), and tell fzf to break score ties by input order
@@ -551,7 +524,7 @@ map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent fi
 -- (live_grep has glob parsing built in; live_grep_glob is deprecated.)
 map('n', '<leader>fg', fzf.live_grep,            { desc = 'Grep in project (+ file glob)' })
 map('n', '<leader>fb', fzf.buffers,              { desc = 'Open buffers' })
-map('n', '<leader>fh', tb.help_tags,             { desc = 'Help tags' })
+map('n', '<leader>fh', fzf.helptags,             { desc = 'Help tags' })
 -- Jump list back/forward (aliases for native <C-o>/<C-i>, so they can live
 -- under the topbar's "goto" (g) submenu). VS Code's Alt-Left / Alt-Right.
 map('n', 'g[', '<C-o>', { desc = 'Jump back' })
@@ -612,8 +585,8 @@ end
 map({ 'n', 'x', 'o' }, 'H', smart_home, { expr = true, desc = 'Start of line (smart: non-blank, else col 0)' })
 map({ 'n', 'x', 'o' }, 'L', '$', { desc = 'End of line (like $)' })
 
--- Show ALL keybindings (searchable full list via Telescope):
-map('n', '<leader>?', tb.keymaps, { desc = 'Show all keybindings' })
+-- Show ALL keybindings (searchable full list via fzf-lua):
+map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
 
 -- Git blame / history (gitsigns + fugitive) ----------------------------------
 -- <leader>gb : popup with full blame + diff for the line under the cursor
