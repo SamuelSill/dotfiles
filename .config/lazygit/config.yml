@@ -3,6 +3,11 @@
 # Keep delta MINIMAL here: no --side-by-side / --line-numbers. Those reformat the
 # diff layout, which fights lazygit's hunk/line staging view. Plain delta just
 # adds syntax highlighting to an otherwise-normal unified diff.
+
+# Don't stop on a "Press ENTER to return to lazygit" screen after a subprocess
+# (e.g. the editor) exits — jump straight back into lazygit.
+promptToReturnFromSubprocess: false
+
 git:
   pagers:
     - colorArg: always
