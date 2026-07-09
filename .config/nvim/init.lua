@@ -100,7 +100,10 @@ require('lazy').setup({
   {
     'nvim-lualine/lualine.nvim',
     opts = {
-      options = { theme = 'tokyonight' },
+      -- globalstatus (one statusline for the whole editor, laststatus=3) so the
+      -- reserved topbar window doesn't get a per-window statusline drawn as an
+      -- extra row right beneath it. The topbar plugin also forces laststatus=3.
+      options = { theme = 'tokyonight', globalstatus = true },
       -- Show the file's path relative to the cwd (path = 1) instead of just the
       -- bare filename (path = 0). Use 2 for absolute, 3 for absolute with ~.
       sections = { lualine_c = { { 'filename', path = 1 } } },
@@ -544,8 +547,12 @@ map('n', '<leader>gxn', '<cmd>GitConflictChooseNone<cr>',   { desc = 'Conflict: 
 --------------------------------------------------------------------------------
 -- 6. topbar: always-on shortcut bar (github.com/SamuelSill/topbar)
 --------------------------------------------------------------------------------
--- Shows your shortcuts in the tabline and drills down as you type. Edit the
--- layout in topbar.json and run :TopbarReload — no restart needed. The general
+-- Shows your shortcuts in a reserved, multi-line bar pinned to the top of the
+-- editor (content is pushed down, not hidden) and drills down as you type. Edit
+-- the layout in topbar.json and run :TopbarReload — no restart needed. NOTE:
+-- topbar forces laststatus=3 (one global statusline) because a reserved top
+-- window under laststatus=2 would draw its own statusline as an extra row; the
+-- lualine spec above is set to globalstatus=true to match. The general
 -- layout lives here; an optional machine-specific layout ($NVIM_LOCAL_TOPBAR)
 -- is merged on top. The plugin is a git submodule at DOTFILES_DIR/topbar (run
 -- `git submodule update --init` after cloning); we load it off runtimepath

@@ -1,8 +1,5 @@
 {
-  "_comment": "GENERAL topbar layout (shared dotfiles). An optional machine-specific layout ($NVIM_LOCAL_TOPBAR) is merged on top at load time. Edit and run :TopbarReload (no restart needed). Submenus are derived from the key sequences in 'bindings'. A leaf must be backed by a real mapping (or a native key) to actually do something.",
-
   "triggers": ["<leader>", "g"],
-  "separator": "·",
   "branch_marker": "›",
   "breadcrumb_separator": "▏",
 
@@ -10,25 +7,37 @@
     "<leader>": "SPC",
     "<CR>": "↵",
     "<Tab>": "⇥",
-    "<Esc>": "ESC"
+    "<Esc>": "ESC",
+    "<A-J>": "A-S-j",
+    "<A-K>": "A-S-k"
   },
 
+  "lines": [
+    { "bg": "#3a4d73", "bg_alt": "#2b3a55" },
+    { "bg": "#4f3f6e", "bg_alt": "#3b2f52" }
+  ],
+
   "highlights": {
-    "key":   { "link": "Function" },
-    "desc":  { "link": "Comment" },
-    "title": { "link": "Title" },
-    "sep":   { "link": "NonText" },
-    "fill":  { "link": "TabLineFill" }
+    "key":    { "fg": "#a6e3a1", "bold": true },
+    "desc":   { "fg": "#cdd6f4" },
+    "branch": { "fg": "#89b4fa", "bold": true },
+    "title":  { "fg": "#f5c2e7", "bold": true },
+    "sep":    { "fg": "#585b70" }
   },
 
   "bindings": [
-    [">>", "indent"],
-    ["<<", "unindent"],
+    ["*", "search word", 1],
+    [":%s/x/y/g", "replace in file", 1],
+    ["<A-J>", "add cursor ↓", 1],
+    ["<A-K>", "add cursor ↑", 1],
 
-    ["}", "para down"],
-    ["{", "para up"],
-    ["<A-j>", "move ↓"],
-    ["<A-k>", "move ↑"],
+    ["<leader>mn", "add next match"],
+    ["<leader>mp", "add prev match"],
+
+    ["f", "→ char", 2],
+    ["F", "← char", 2],
+    ["t", "→ till char", 2],
+    ["T", "← till char", 2],
 
     ["gd", "def"],
     ["gr", "refs"],
@@ -45,6 +54,8 @@
     ["<leader>fr", "find/replace"],
     ["<leader>fb", "open files"],
     ["<leader>fh", "help"],
+    ["<leader>fs", "symbol # (project)"],
+    ["<leader>fS", "symbol @ (file)"],
 
     ["<leader>rn", "rename"],
     ["<leader>?",  "all keys"],
@@ -60,32 +71,41 @@
     ["<leader>gxb", "conflict: both"],
     ["<leader>gxn", "conflict: none"],
 
+    ["<leader>hu", "inherit: base types"],
+    ["<leader>hd", "inherit: derived types"],
+    ["<leader>hi", "implementors (overrides)"],
+
     ["<leader>yp", "rel path"],
     ["<leader>yP", "full path"]
   ],
 
   "groups": [
-    ["g",         "goto"],
-    ["<leader>",  "menu"],
+    ["<leader>",  "menu", 0],
+    ["g",         "goto", 0],
     ["<leader>f", "find"],
     ["<leader>r", "rename"],
     ["<leader>g", "git"],
     ["<leader>gx", "conflict"],
-    ["<leader>y", "yank"]
+    ["<leader>h", "hierarchy"],
+    ["<leader>y", "yank"],
+    ["<leader>m", "multicursor"]
   ],
 
-  "_visual_comment": "Shown in the tabline while in visual / visual-line / visual-block mode instead of the normal bindings. These are native visual-mode keys (a flat cheatsheet, no submenus).",
   "visual": {
     "bindings": [
-      ["u", "lowercase"],
-      ["U", "uppercase"],
-      ["~", "toggle case"],
-      [">", "indent"],
-      ["<", "unindent"],
-      ["y", "yank"],
-      ["d", "delete"],
-      ["<A-j>", "move ↓"],
-      ["<A-k>", "move ↑"]
+      ["u", "lowercase", 1],
+      ["U", "uppercase", 1],
+      ["~", "toggle case", 1],
+      [">", "indent", 1],
+      ["<", "unindent", 1],
+
+      ["o", "other end", 2],
+      ["i", "inside block", 2],
+      ["a", "around block", 2],
+      ["y", "yank", 2],
+      ["d", "delete", 2],
+      ["<A-j>", "move ↓", 2],
+      ["<A-k>", "move ↑", 2]
     ]
   }
 }
