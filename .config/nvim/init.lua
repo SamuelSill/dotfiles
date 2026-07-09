@@ -116,6 +116,43 @@ require('lazy').setup({
   -- fast). Auto-hooks LSP progress; no wiring needed.
   { 'j-hui/fidget.nvim', opts = {} },
 
+  -- Multiple cursors (VS Code's Ctrl+Alt+Down) --------------------------------
+  -- Neovim has no native multi-cursor; this adds real extra cursors. The core
+  -- binding is "add a cursor on the line below/above at the same column".
+  {
+    'jake-stewart/multicursor.nvim',
+    event = 'VeryLazy',
+    config = function()
+      local mc = require('multicursor-nvim')
+      mc.setup()
+      -- Add a cursor directly below / above on the same column (VS Code's
+      -- Ctrl+Alt+Down / Up). <A-j>/<A-k> already move lines, so use Alt+Shift+j/k.
+      -- (Ctrl+Alt+<key> isn't reliably delivered by terminals; plain Alt is.)
+      vim.keymap.set({ 'n', 'x' }, '<A-J>', function() mc.lineAddCursor(1) end,
+        { desc = 'Add cursor below (same column)' })
+      vim.keymap.set({ 'n', 'x' }, '<A-K>', function() mc.lineAddCursor(-1) end,
+        { desc = 'Add cursor above (same column)' })
+      -- Bonus: add a cursor at the next / previous match of the word under the
+      -- cursor (or the current visual selection) — grow a multi-selection.
+      vim.keymap.set({ 'n', 'x' }, '<leader>mn', function() mc.matchAddCursor(1) end,
+        { desc = 'Multicursor: add next match' })
+      vim.keymap.set({ 'n', 'x' }, '<leader>mp', function() mc.matchAddCursor(-1) end,
+        { desc = 'Multicursor: add prev match' })
+      -- Mappings that live ONLY while extra cursors exist (a "layer"), so they
+      -- don't shadow your normal keys. The callback is handed a `set` function
+      -- (mode, lhs, rhs) — call it directly. <Esc> is how you LEAVE multicursor:
+      -- first <Esc> re-enables frozen cursors, otherwise it clears them (back to
+      -- a single cursor). <C-c> also clears, as an escape hatch.
+      mc.addKeymapLayer(function(set)
+        set({ 'n', 'x' }, '<Esc>', function()
+          if not mc.cursorsEnabled() then mc.enableCursors()
+          elseif mc.hasCursors() then mc.clearCursors() end
+        end, { desc = 'Multicursor: enable / clear cursors' })
+        set({ 'n', 'x' }, '<C-c>', mc.clearCursors, { desc = 'Multicursor: clear all cursors' })
+      end)
+    end,
+  },
+
   -- File explorer sidebar (VS Code's file tree) -------------------------------
   {
     'nvim-tree/nvim-tree.lua',
