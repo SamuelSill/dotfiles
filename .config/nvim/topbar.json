@@ -9,7 +9,13 @@
     "<Tab>": "⇥",
     "<Esc>": "ESC",
     "<A-J>": "A-S-j",
-    "<A-K>": "A-S-k"
+    "<A-K>": "A-S-k",
+    "<S-Tab>": "⇧⇥",
+    "<C-Space>": "C-Spc",
+    "<C-f>": "C-f",
+    "<C-b>": "C-b",
+    "<C-l>": "C-l",
+    "<C-]>": "C-]"
   },
 
   "lines": [
@@ -106,6 +112,20 @@
       ["d", "delete", 2],
       ["<A-j>", "move ↓", 2],
       ["<A-k>", "move ↑", 2]
+    ]
+  },
+
+  "insert": {
+    "bindings": [
+      ["<Tab>", "next", 1],
+      ["<S-Tab>", "prev", 1],
+      ["<CR>", "accept", 1],
+      ["<C-Space>", "open", 1],
+      ["<C-f>", "docs ↓", 1],
+      ["<C-b>", "docs ↑", 1],
+
+      ["<C-l>", "copilot ✓", 2],
+      ["<C-]>", "copilot dismiss", 2]
     ]
   }
 }
