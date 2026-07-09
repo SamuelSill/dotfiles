@@ -493,8 +493,35 @@ map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (re
 map('n', 'gd', smart_goto_definition, { desc = 'Goto definition / file under cursor' })
 -- File/grep/buffer pickers use fzf-lua (fast on huge trees); Telescope stays
 -- for LSP pickers (gr references) and help/keymaps.
-map('n', '<C-p>',      fzf.files,                { desc = 'Find files' })
-map('n', '<leader>ff', fzf.files,                { desc = 'Find files' })
+-- Find-files with recently-visited files floated to the top: prepend this cwd's
+-- entries from :oldfiles (most-recent first, existing only) to the streamed `fd`
+-- list, dedupe (recents win), and tell fzf to break score ties by input order
+-- (--tiebreak=index) so a recent match outranks an equally-good non-recent one.
+-- Stays fast on huge trees because fd still streams — we only prepend a handful
+-- of lines. fd command mirrors the fd_opts in the fzf-lua setup above.
+local function find_files_recent_first()
+  local cwd = vim.uv.cwd()
+  local prefix = cwd .. '/'
+  local seen, recent = {}, {}
+  for _, f in ipairs(vim.v.oldfiles) do
+    if f:sub(1, #prefix) == prefix and vim.uv.fs_stat(f) then
+      local rel = f:sub(#prefix + 1)
+      if rel ~= '' and not seen[rel] then
+        seen[rel] = true
+        recent[#recent + 1] = vim.fn.shellescape(rel)
+      end
+    end
+  end
+  local fd = vim.fn.executable('fd') == 1 and 'fd' or 'fdfind'
+  local find = fd .. ' --type f --color=never --hidden --exclude .git'
+  local prepend = #recent > 0 and ("printf '%s\\n' " .. table.concat(recent, ' ') .. '; ') or ''
+  -- awk keeps the first occurrence of each path, so a recent line suppresses its
+  -- later duplicate from fd; non-recent order is left as fd emits it.
+  local cmd = '{ ' .. prepend .. find .. "; } | awk '!seen[$0]++'"
+  fzf.files({ cmd = cmd, fzf_opts = { ['--tiebreak'] = 'index' } })
+end
+map('n', '<C-p>',      find_files_recent_first,  { desc = 'Find files (recent first)' })
+map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent first)' })
 -- Grep in cwd. Append ` -- <glob>` to filter files, VS Code "files to include"
 -- style, e.g.  TODO -- *.cc   or   parse -- *.{h,cc} !*test*
 -- (live_grep has glob parsing built in; live_grep_glob is deprecated.)
