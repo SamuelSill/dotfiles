@@ -533,6 +533,34 @@ map('n', '<leader>w',  '<cmd>write<cr>',         { desc = 'Save file' })
 map('n', '<leader>q',  '<cmd>quit<cr>',          { desc = 'Quit window' })
 map('n', '<Esc>',      '<cmd>nohlsearch<cr>',    { desc = 'Clear search highlight' })
 
+-- Line-jump shortcuts (home row): H = start of line, L = end of line (like `$`).
+-- H is "smart" and toggles between the first non-blank char (like `^`) and the
+-- very start of the line (like `0`):
+--   * from anywhere past the indent → first non-blank char
+--   * when only whitespace is to the left (at/inside the indent) → col 0
+--   * when already at col 0 → back to the first non-blank char
+--   * all-blank line → col 0
+-- expr = true so a single mapping returns the right motion for normal, visual
+-- and operator-pending modes (e.g. dL to end, yH to start), replacing H/L's
+-- default "top/bottom of screen" jumps.
+local function smart_home()
+  local col = vim.fn.col('.')
+  -- 1-indexed column of first non-blank; 0 when the line is entirely blank.
+  local first = vim.fn.match(vim.fn.getline('.'), '\\S') + 1
+  if first == 0 then
+    return '0'   -- all-blank line → very start
+  end
+  if col == 1 then
+    return '^'   -- already at the very start → jump to first non-blank
+  end
+  if col <= first then
+    return '0'   -- only whitespace to the left → very start
+  end
+  return '^'     -- otherwise → first non-blank char
+end
+map({ 'n', 'x', 'o' }, 'H', smart_home, { expr = true, desc = 'Start of line (smart: non-blank, else col 0)' })
+map({ 'n', 'x', 'o' }, 'L', '$', { desc = 'End of line (like $)' })
+
 -- Show ALL keybindings (searchable full list via Telescope):
 map('n', '<leader>?', tb.keymaps, { desc = 'Show all keybindings' })
 
