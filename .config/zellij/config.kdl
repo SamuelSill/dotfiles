@@ -81,6 +81,7 @@ keybinds clear-defaults=true {
         bind "l" { MovePane "right"; }
         bind "," { MoveTab "left"; }
         bind "." { MoveTab "right"; }
+        bind "d" { BreakPane; SwitchToMode "normal"; }
         bind "n" { MovePane; }
         bind "p" { MovePaneBackwards; }
         bind "tab" { MovePane; }
@@ -161,6 +162,8 @@ keybinds clear-defaults=true {
         bind "Alt n" { SwitchToMode "tmux"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Alt w" { CloseFocus; }
+        bind "Alt d" { Detach; }
+        bind "Alt q" { Quit; }
         bind "Ctrl q" { Quit; }
         bind "Alt 1" { GoToTab 1; }
         bind "Alt 2" { GoToTab 2; }
