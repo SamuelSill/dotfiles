@@ -459,7 +459,26 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('K',  vim.lsp.buf.hover,             'Hover docs')
     map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
     map('<leader>ca', vim.lsp.buf.code_action,'Code action')
-    map('<leader>o',  '<cmd>ClangdSwitchSourceHeader<cr>', 'Switch header/source')
+    -- Switch between a C/C++ source and its header. We call clangd's custom LSP
+    -- request directly rather than the :ClangdSwitchSourceHeader user command,
+    -- which isn't auto-registered on newer Neovim/lspconfig.
+    map('gh', function()
+      local client = vim.lsp.get_clients({ bufnr = 0, name = 'clangd' })[1]
+      if not client then
+        vim.notify('Switch header/source: clangd not attached to this buffer', vim.log.levels.WARN)
+        return
+      end
+      local params = vim.lsp.util.make_text_document_params(0)
+      client:request('textDocument/switchSourceHeader', params, function(err, result)
+        if err then
+          vim.notify('switchSourceHeader: ' .. tostring(err.message), vim.log.levels.ERROR)
+        elseif not result or result == '' then
+          vim.notify('No corresponding source/header file', vim.log.levels.INFO)
+        else
+          vim.cmd.edit(vim.uri_to_fname(result))
+        end
+      end, 0)
+    end, 'Switch header/source')
     map('[d', vim.diagnostic.goto_prev,      'Prev diagnostic')
     map(']d', vim.diagnostic.goto_next,      'Next diagnostic')
     map('<leader>dd', vim.diagnostic.open_float, 'Show diagnostic under cursor')

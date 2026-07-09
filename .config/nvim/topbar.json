@@ -44,10 +44,10 @@
     ["gi", "impl"],
     ["g[", "back"],
     ["g]", "forward"],
+    ["gh",         "hdr/src"],
 
     ["<leader>e",  "explorer"],
     ["<leader>q",  "quit"],
-    ["<leader>o",  "hdr/src"],
 
     ["<leader>ff", "files"],
     ["<leader>fg", "grep (+glob)"],
