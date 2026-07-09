@@ -205,6 +205,11 @@ require('lazy').setup({
           -- fd honours .gitignore (so build output is skipped); no --follow to
           -- avoid chasing symlinks around the tree.
           fd_opts = '--type f --color=never --hidden --exclude .git',
+          -- Single-select only. With --multi (the default), marking 2+ entries and
+          -- hitting <CR> runs file_edit_or_qf, which dumps them into the quickfix
+          -- window — the "extra dialog with other paths". We just want to open the
+          -- one file, so disable multi (splits/toggles actions are unaffected).
+          fzf_opts = { ['--multi'] = false },
         },
       })
     end,
@@ -537,7 +542,7 @@ local function find_files_recent_first()
   -- awk keeps the first occurrence of each path, so a recent line suppresses its
   -- later duplicate from fd; non-recent order is left as fd emits it.
   local cmd = '{ ' .. prepend .. find .. "; } | awk '!seen[$0]++'"
-  fzf.files({ cmd = cmd, fzf_opts = { ['--tiebreak'] = 'index' } })
+  fzf.files({ cmd = cmd, fzf_opts = { ['--tiebreak'] = 'index', ['--multi'] = false } })
 end
 map('n', '<C-p>',      find_files_recent_first,  { desc = 'Find files (recent first)' })
 map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent first)' })
