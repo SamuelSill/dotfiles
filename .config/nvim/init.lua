@@ -286,6 +286,28 @@ require('lazy').setup({
     end,
   },
 
+  -- GitHub Copilot: inline AI autocomplete (VS Code-style ghost text) ---------
+  -- Suggestions appear greyed-out ahead of the cursor as you type; accept with
+  -- <C-l>. NOT <Tab> — that's nvim-cmp's select-next above, so Copilot lives on
+  -- its own key and the two completion systems don't fight.
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    opts = {
+      suggestion = {
+        auto_trigger = true,      -- stream ghost text without pressing a key
+        keymap = {
+          accept = '<C-l>',       -- accept the whole suggestion
+          next = '<M-]>',         -- cycle to the next suggestion
+          prev = '<M-[>',
+          dismiss = '<C-]>',
+        },
+      },
+      panel = { enabled = false }, -- ghost text only; no split-panel UI
+    },
+  },
+
   -- Git: inline blame + hunks (gitsigns) and full git interface (fugitive) ----
   {
     'lewis6991/gitsigns.nvim',
