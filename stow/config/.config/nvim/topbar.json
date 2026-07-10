@@ -67,7 +67,6 @@
     ["<leader>?",  "all keys"],
 
     ["<leader>gb", "blame line"],
-    ["<leader>gB", "blame inline"],
     ["<leader>gv", "blame column"],
     ["<leader>gl", "line history"],
     ["<leader>gc", "line change"],
