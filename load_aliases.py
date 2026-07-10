@@ -11,7 +11,6 @@ from pathlib import Path
 PLATFORM_KEY = {
     'Darwin': 'mac',
     'Linux': 'linux',
-    'Windows': 'windows',
 }
 
 
@@ -44,20 +43,6 @@ def create_alias_command(name, command, shell_type):
         if not re.search(r'\$[@\d]', command):
             cmd_escaped = f'{cmd_escaped} "$@"'
         return f"{name}() {{ {cmd_escaped}; }}"
-    elif shell_type == 'powershell':
-        # Translate shell arg references to PowerShell equivalents
-        ps_command = re.sub(r'\$@', '$args', command)
-        ps_command = re.sub(r'\$(\d+)', lambda m: f'$args[{int(m.group(1)) - 1}]', ps_command)
-        # If command doesn't already handle args, append $args
-        if not re.search(r'\$[@\d]', command):
-            ps_command = f'{ps_command} $args'
-        cmd_escaped = ps_command.replace('"', '`"')
-        # Check if command starts with its own name - add .exe suffix to avoid recursion
-        cmd_first_word = re.split(r'\s', command.strip())[0]
-        if cmd_first_word == name:
-            rest_of_cmd = ps_command[len(name):].replace('"', '`"')
-            return f"function global:{name} {{ & {name}.exe{rest_of_cmd} }}"
-        return f"function global:{name} {{ Invoke-Expression '{cmd_escaped}' }}"
     else:
         raise ValueError(f"Unknown shell type: {shell_type}")
 
@@ -84,7 +69,7 @@ def main():
     )
     parser.add_argument(
         'shell_type',
-        choices=['sh', 'powershell'],
+        choices=['sh'],
         help='Shell type to generate aliases for'
     )
 

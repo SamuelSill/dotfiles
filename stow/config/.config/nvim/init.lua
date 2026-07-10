@@ -1,11 +1,10 @@
--- dotfiles/.config/nvim/init.lua
+-- dotfiles/stow/config/.config/nvim/init.lua
 -- A beginner-friendly, VS-Code-flavored Neovim config (GENERAL / shared).
 --
 -- This is the general config, kept in the shared dotfiles repo and deployed by
--- copying dotfiles/.config/ into ~/.config/. At the very end it optionally
--- layers on machine-specific overrides via $NVIM_LOCAL_INIT / $NVIM_LOCAL_TOPBAR
--- (see section 9). (Do NOT add a separate bootstrap in ~/.config/nvim — the copy
--- would overwrite it.)
+-- GNU stow, which symlinks dotfiles/stow/config/.config/ into ~/.config/. At the
+-- very end it optionally layers on machine-specific overrides via
+-- $NVIM_LOCAL_INIT / $NVIM_LOCAL_TOPBAR (see section 9).
 --
 -- HOW THIS FILE IS ORGANIZED:
 --   1. Leader key        (must come first)
@@ -26,12 +25,14 @@
 vim.g.mapleader = ' '       -- <Space> is your "command" key
 vim.g.maplocalleader = ' '
 
--- Deployment: dotfiles/.config/ is COPIED into ~/.config/, so at runtime this
--- file lives at ~/.config/nvim/init.lua. Copied siblings (topbar.json,
--- lazy-lock.json) are found via stdpath('config'). The topbar plugin is NOT
--- copied into ~/.config; it lives in this repo, found via $DOTFILES_DIR
--- (exported by the dotfiles tools.sh). Optional machine-specific overrides are
--- layered on at the end via $NVIM_LOCAL_INIT / $NVIM_LOCAL_TOPBAR (see sect. 9).
+-- Deployment: dotfiles/stow/config/.config/ is symlinked into ~/.config/ by GNU
+-- stow (--no-folding), so at runtime this file is ~/.config/nvim/init.lua ->
+-- repo. The topbar.json sibling is symlinked the same way and found via
+-- stdpath('config'); lazy-lock.json is a real file stow leaves in ~/.config/nvim
+-- (never written back into the repo). The topbar plugin is NOT symlinked into
+-- ~/.config; it lives in this repo, found via $DOTFILES_DIR (exported by the
+-- dotfiles setup.zsh). Optional machine-specific overrides are layered on at the
+-- end via $NVIM_LOCAL_INIT / $NVIM_LOCAL_TOPBAR (see sect. 9).
 local DOTFILES_DIR = vim.env.DOTFILES_DIR
 if not DOTFILES_DIR or DOTFILES_DIR == '' then
   DOTFILES_DIR = vim.fn.expand('~/dotfiles')
@@ -667,18 +668,18 @@ map('n', '<leader>gxn', '<cmd>GitConflictChooseNone<cr>',   { desc = 'Conflict: 
 -- layout lives here; an optional machine-specific layout ($NVIM_LOCAL_TOPBAR)
 -- is merged on top. The plugin is a git submodule at DOTFILES_DIR/topbar (run
 -- `git submodule update --init` after cloning); we load it off runtimepath
--- rather than copying it into ~/.config.
+-- rather than symlinking it into ~/.config.
 local topbar_dir = DOTFILES_DIR .. '/topbar'
 if vim.fn.isdirectory(topbar_dir) == 1 then
   vim.opt.runtimepath:append(topbar_dir)
-  -- General layout: the copied file next to this init; fall back to the repo
-  -- copy for a non-copied / standalone checkout.
+  -- General layout: the stow-symlinked file next to this init; fall back to the
+  -- repo copy for a non-stowed / standalone checkout.
   local general_json = vim.fn.stdpath('config') .. '/topbar.json'
   if not (vim.uv or vim.loop).fs_stat(general_json) then
-    general_json = DOTFILES_DIR .. '/.config/nvim/topbar.json'
+    general_json = DOTFILES_DIR .. '/stow/config/.config/nvim/topbar.json'
   end
   local topbar_configs = { general_json }
-  -- Optional machine-specific layout (not copied into ~/.config): merge it.
+  -- Optional machine-specific layout (not symlinked into ~/.config): merge it.
   local local_topbar = vim.env.NVIM_LOCAL_TOPBAR
   if local_topbar and local_topbar ~= '' and (vim.uv or vim.loop).fs_stat(local_topbar) then
     table.insert(topbar_configs, local_topbar)
