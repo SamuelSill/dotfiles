@@ -7,7 +7,7 @@ My personal setup - all in one repo.
 ```sh
 git clone --recursive git@github.com:SamuelSill/dotfiles.git
 cd dotfiles
-./install.sh
+./install.py
 ```
 
 ### Uninstall
