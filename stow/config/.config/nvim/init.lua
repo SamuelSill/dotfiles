@@ -219,14 +219,14 @@ require('lazy').setup({
       -- 'markdown' (block structure) and 'markdown_inline' (inline spans).
       -- Project-specific parsers (e.g. 'gn') can be added by a local override.
       require('nvim-treesitter').install({
-        'c', 'cpp', 'lua', 'python', 'bash', 'json',
+        'c', 'cpp', 'lua', 'python', 'rust', 'bash', 'json',
         'markdown', 'markdown_inline',
       })
 
       -- 'main' does not auto-enable highlighting; turn it on per-filetype.
       -- Skip huge generated files (some large repos contain them).
       vim.api.nvim_create_autocmd('FileType', {
-        pattern = { 'c', 'cpp', 'lua', 'python', 'sh', 'bash', 'json',
+        pattern = { 'c', 'cpp', 'lua', 'python', 'rust', 'sh', 'bash', 'json',
                     'markdown' },
         callback = function(ev)
           local name = vim.api.nvim_buf_get_name(ev.buf)
@@ -240,6 +240,20 @@ require('lazy').setup({
 
   -- LSP client config helper --------------------------------------------------
   { 'neovim/nvim-lspconfig' },
+
+  -- LSP server installer (mason) ----------------------------------------------
+  -- Fetches language-server binaries into a private dir and puts them on
+  -- Neovim's PATH, so you don't install pyright / rust-analyzer system-wide.
+  -- mason-lspconfig auto-installs the servers in ensure_installed on first
+  -- launch (a one-time download; pyright needs Node, rust-analyzer is a
+  -- prebuilt binary). clangd is intentionally NOT mason-managed: on the
+  -- Chromium tree we use the version-matched tree clangd (see local override).
+  { 'williamboman/mason.nvim', opts = {} },
+  {
+    'williamboman/mason-lspconfig.nvim',
+    dependencies = { 'williamboman/mason.nvim', 'neovim/nvim-lspconfig' },
+    opts = { ensure_installed = { 'pyright', 'rust_analyzer' } },
+  },
 
   -- Autocompletion ------------------------------------------------------------
   {
@@ -345,13 +359,21 @@ require('lazy').setup({
 -- `cmd` (binary path + project-tuned flags) when running in that environment.
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- Native LSP API (Neovim 0.11+). nvim-lspconfig ships the default clangd
--- definition (filetypes, root markers); we merge our cmd/capabilities on top.
-vim.lsp.config('clangd', {
-  cmd = { 'clangd' },
-  capabilities = capabilities,
-})
-vim.lsp.enable('clangd')
+-- Native LSP API (Neovim 0.11+). Apply completion capabilities to EVERY server
+-- via the '*' wildcard config, so nvim-cmp works in any language (clangd,
+-- pyright, rust_analyzer, …) — not just C/C++.
+vim.lsp.config('*', { capabilities = capabilities })
+
+-- clangd: nvim-lspconfig ships the default definition (filetypes, root markers);
+-- we merge the system-binary `cmd` on top (a local override swaps in Chromium's).
+vim.lsp.config('clangd', { cmd = { 'clangd' } })
+
+-- Enable the servers we use. pyright (Python) and rust_analyzer (Rust) are
+-- installed by mason (see plugins above); nvim-lspconfig supplies each server's
+-- default cmd/filetypes/root markers. Enabling registers a FileType hook that
+-- launches the right server when you open a matching buffer — this is what makes
+-- gd/gr/K/rename/diagnostics LSP-powered in those languages, not just C/C++.
+vim.lsp.enable({ 'clangd', 'pyright', 'rust_analyzer' })
 
 -- Make the "symbol under cursor" highlight visible and theme-aware. Re-apply
 -- on ColorScheme so it survives a theme switch.
