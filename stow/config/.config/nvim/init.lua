@@ -186,6 +186,13 @@ require('lazy').setup({
           -- one file, so disable multi (splits/toggles actions are unaffected).
           fzf_opts = { ['--multi'] = false },
         },
+        lsp = {
+          -- Same story for LSP lists (gr references, gd, etc.): with --multi on,
+          -- <CR> runs file_edit_or_qf, and a >1 selection is dumped into a
+          -- quickfix window (botright copen) — the extra window at the bottom
+          -- instead of jumping straight to the ref. Single-select fixes it.
+          fzf_opts = { ['--multi'] = false },
+        },
       })
     end,
   },
@@ -435,6 +442,24 @@ end
 -- Expose it so a local override (and anything else) can reuse the same behavior.
 _G.SmartGotoDefinition = smart_goto_definition
 
+-- Smart "go to references" that works in EVERY buffer, mirroring gd above:
+--   1. If a language server with references support is attached, ask it (exact,
+--      scope-aware — clangd for C/C++).
+--   2. Otherwise fall back to a project-wide grep for the word under the cursor,
+--      so `gr` still finds usages in languages with no LSP configured here (e.g.
+--      python3, where only clangd is set up). Both open the same fzf-lua list.
+local function smart_references()
+  local fzf = require('fzf-lua')
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if client.server_capabilities.referencesProvider then
+      fzf.lsp_references()
+      return
+    end
+  end
+  fzf.grep_cword()
+end
+_G.SmartReferences = smart_references
+
 -- Add each file's git root to its buffer-local &path, so project-relative
 -- paths (e.g. include-style `base/foo.h`) resolve with gd/gf no matter what the
 -- cwd is. Non-recursive, so it stays fast even on a huge tree.
@@ -456,7 +481,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local fzf = require('fzf-lua')
     map('gd', smart_goto_definition,         'Goto definition / file under cursor')
     map('gD', vim.lsp.buf.declaration,       'Goto declaration')
-    map('gr', fzf.lsp_references,            'Goto references')
+    map('gr', smart_references,              'Goto references')
     map('gi', vim.lsp.buf.implementation,    'Goto implementation')
     map('K',  vim.lsp.buf.hover,             'Hover docs')
     map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
@@ -511,6 +536,8 @@ local fzf = require('fzf-lua')
 map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (reveal current file)' })
 -- Goto file-under-cursor / definition — works in every buffer (see section 4).
 map('n', 'gd', smart_goto_definition, { desc = 'Goto definition / file under cursor' })
+-- Goto references — LSP when attached, else grep word under cursor (see sect. 4).
+map('n', 'gr', smart_references, { desc = 'Goto references' })
 -- All pickers use fzf-lua — files/grep/buffers plus LSP (gr references,
 -- implementors) and help/keymaps.
 -- Find-files with recently-visited files floated to the top: prepend this cwd's
