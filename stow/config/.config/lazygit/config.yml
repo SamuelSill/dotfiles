@@ -8,6 +8,13 @@
 # (e.g. the editor) exits — jump straight back into lazygit.
 promptToReturnFromSubprocess: false
 
+gui:
+  screenMode: normal
+  sidePanelWidth: 0.4
+  showCommandLog: false
+  expandFocusedSidePanel: true
+  expandedSidePanelWeight: 16
+
 git:
   pagers:
     - colorArg: always
