@@ -219,6 +219,18 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    event = 'VeryLazy',
+    opts = {
+      mode = 'cursor',            -- track the scopes the CURSOR is in
+      max_lines = 0,              -- show every enclosing header (0 = no cap)
+      multiline_threshold = 1,    -- collapse each scope to its first (header) line
+      trim_scope = 'outer',       -- if ever capped, drop the outermost first
+      separator = nil,
+    },
+  },
+
   -- LSP client config helper --------------------------------------------------
   { 'neovim/nvim-lspconfig' },
 
