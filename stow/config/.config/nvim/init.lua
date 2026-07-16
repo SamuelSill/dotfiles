@@ -139,6 +139,14 @@ require('lazy').setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('fzf-lua').setup({
+        fzf_opts = { ['--cycle'] = true },
+        keymap = {
+          fzf = {
+            true,
+            ['tab']       = 'down',
+            ['shift-tab'] = 'up',
+          },
+        },
         files = {
           -- fd honours .gitignore (so build output is skipped); no --follow to
           -- avoid chasing symlinks around the tree.
@@ -147,14 +155,17 @@ require('lazy').setup({
           -- hitting <CR> runs file_edit_or_qf, which dumps them into the quickfix
           -- window — the "extra dialog with other paths". We just want to open the
           -- one file, so disable multi (splits/toggles actions are unaffected).
-          fzf_opts = { ['--multi'] = false },
+          fzf_opts = { ['--multi'] = false, ['--cycle'] = true },
         },
         lsp = {
           -- Same story for LSP lists (gr references, gd, etc.): with --multi on,
           -- <CR> runs file_edit_or_qf, and a >1 selection is dumped into a
           -- quickfix window (botright copen) — the extra window at the bottom
           -- instead of jumping straight to the ref. Single-select fixes it.
-          fzf_opts = { ['--multi'] = false },
+          fzf_opts = { ['--multi'] = false, ['--cycle'] = true },
+        },
+        grep = {
+          fzf_opts = { ['--multi'] = false, ['--cycle'] = true },
         },
       })
     end,
