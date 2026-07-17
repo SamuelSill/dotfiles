@@ -4,16 +4,15 @@
 //                configure below; the rest get a badge only (no hint clutter).
 //
 // zjstatus is downloaded + cached from its GitHub release on first run (needs
-// network the first time). Pinned to v0.23.0; bump the URL to update.
+// network the first time). Pinned to v0.24.0; bump the URL to update.
 //
 // NOTE: the clock uses datetime_timezone below — change it to your IANA zone if
 // the time looks off (e.g. "Europe/London", "America/New_York").
 
 layout {
-    default_tab_template {
-        // ── TOP bar: tabs · clock · session ─────────────────────────────────
-        pane size=1 borderless=true {
-            plugin location="https://github.com/dj95/zjstatus/releases/download/v0.23.0/zjstatus.wasm" {
+    // ── TOP bar: tabs · clock · session ─────────────────────────────────────
+    pane_template name="top_bar" borderless=true {
+        plugin location="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm" {
                 // format_space is the fill between the left/center/right groups;
                 // it MUST be non-empty (with the bar bg) or center/right collapse.
                 format_space  "#[bg=#181825]"
@@ -30,14 +29,12 @@ layout {
                 datetime          "#[fg=#a6adc8,bg=#181825,bold] {format} "
                 datetime_format   "%a %H:%M"
                 datetime_timezone "Asia/Jerusalem"
-            }
         }
+    }
 
-        children
-
-        // ── BOTTOM bar: mode badge + shortcut hints (per-mode via {mode}) ────
-        pane size=1 borderless=true {
-            plugin location="https://github.com/dj95/zjstatus/releases/download/v0.23.0/zjstatus.wasm" {
+    // ── BOTTOM bar: mode badge + shortcut hints (per-mode via {mode}) ────────
+    pane_template name="bottom_bar" borderless=true {
+        plugin location="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm" {
                 // Real-space fill + #[bg=default] resets — this is the mechanic
                 // that actually renders (a color-only format_space with empty
                 // center/right left the line blank). Hints sit on the terminal
@@ -68,7 +65,7 @@ layout {
                 // is its own tile with an alternating background — two shades of
                 // blue for ALT, two shades of mauve for CTRL — so the two groups
                 // stay visually distinct. Keys carry no A-/C- prefix (badges say so).
-                mode_normal "#[fg=#11111b,bg=#b4befe,bold] NORMAL #[bg=default] #[fg=#11111b,bg=#89b4fa,bold] ALT #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] focus #[fg=#a6e3a1,bg=#3a4d73,bold] 1-9#[fg=#cdd6f4,bg=#3a4d73] tab #[fg=#a6e3a1,bg=#2b3a55,bold] n#[fg=#cdd6f4,bg=#2b3a55] create #[fg=#a6e3a1,bg=#3a4d73,bold] d#[fg=#cdd6f4,bg=#3a4d73] detach #[fg=#a6e3a1,bg=#2b3a55,bold] q#[fg=#cdd6f4,bg=#2b3a55] quit #[bg=default]   #[fg=#11111b,bg=#cba6f7,bold] CTRL #[fg=#a6e3a1,bg=#3b2f52,bold] h#[fg=#cdd6f4,bg=#3b2f52] move #[fg=#a6e3a1,bg=#4f3f6e,bold] p#[fg=#cdd6f4,bg=#4f3f6e] panes #[fg=#a6e3a1,bg=#3b2f52,bold] t#[fg=#cdd6f4,bg=#3b2f52] tabs #[fg=#a6e3a1,bg=#4f3f6e,bold] g#[fg=#cdd6f4,bg=#4f3f6e] lock #[bg=default]"
+                mode_normal "#[fg=#11111b,bg=#b4befe,bold] NORMAL #[bg=default] #[fg=#11111b,bg=#89b4fa,bold] ALT #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] focus #[fg=#a6e3a1,bg=#3a4d73,bold] 1-9#[fg=#cdd6f4,bg=#3a4d73] tab #[fg=#a6e3a1,bg=#2b3a55,bold] n#[fg=#cdd6f4,bg=#2b3a55] create #[fg=#a6e3a1,bg=#3a4d73,bold] d#[fg=#cdd6f4,bg=#3a4d73] detach #[fg=#a6e3a1,bg=#2b3a55,bold] q#[fg=#cdd6f4,bg=#2b3a55] quit #[fg=#a6e3a1,bg=#3a4d73,bold] r#[fg=#cdd6f4,bg=#3a4d73] relayout #[bg=default]   #[fg=#11111b,bg=#cba6f7,bold] CTRL #[fg=#a6e3a1,bg=#3b2f52,bold] h#[fg=#cdd6f4,bg=#3b2f52] move #[fg=#a6e3a1,bg=#4f3f6e,bold] p#[fg=#cdd6f4,bg=#4f3f6e] panes #[fg=#a6e3a1,bg=#3b2f52,bold] t#[fg=#cdd6f4,bg=#3b2f52] tabs #[fg=#a6e3a1,bg=#4f3f6e,bold] g#[fg=#cdd6f4,bg=#4f3f6e] lock #[bg=default]"
 
                 // "tmux" slot is repurposed as a CREATE menu (entered via A-n).
                 mode_tmux "#[fg=#1e1e2e,bg=#a6e3a1,bold] CREATE #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] split #[fg=#a6e3a1,bg=#3a4d73,bold] s#[fg=#cdd6f4,bg=#3a4d73] stack #[fg=#a6e3a1,bg=#2b3a55,bold] t#[fg=#cdd6f4,bg=#2b3a55] tab #[bg=default]"
@@ -93,6 +90,74 @@ layout {
                 mode_rename_tab   "#[fg=#1e1e2e,bg=#cba6f7,bold] RENAME #[fg=#a6e3a1,bg=#2b3a55,bold] enter#[fg=#cdd6f4,bg=#2b3a55] confirm #[fg=#a6e3a1,bg=#3a4d73,bold] esc#[fg=#cdd6f4,bg=#3a4d73] cancel #[bg=default]"
                 mode_rename_pane  "#[fg=#1e1e2e,bg=#fab387,bold] RENAME #[fg=#a6e3a1,bg=#2b3a55,bold] enter#[fg=#cdd6f4,bg=#2b3a55] confirm #[fg=#a6e3a1,bg=#3a4d73,bold] esc#[fg=#cdd6f4,bg=#3a4d73] cancel #[bg=default]"
                 mode_prompt       "#[fg=#1e1e2e,bg=#a6adc8,bold] PROMPT #[bg=default]"
+        }
+    }
+
+    // Base tab: top bar, panes, bottom bar. New tabs use this.
+    // (size=1 lives at the use site — pane_template definitions reject `size`.)
+    default_tab_template {
+        top_bar size=1
+        children
+        bottom_bar size=1
+    }
+
+    // Same structure as a named template so the swap layouts below can wrap the
+    // bars around whichever arrangement they snap the panes into.
+    tab_template name="ui" {
+        top_bar size=1
+        children
+        bottom_bar size=1
+    }
+
+    // ── Swap layouts ────────────────────────────────────────────────────────
+    // "Relayout" (Alt ] / Alt [ / Alt r) cycles panes through these arrangements.
+    // max_panes/min_panes pick a sensible variant for the current pane count.
+    swap_tiled_layout name="vertical" {
+        ui max_panes=5 {
+            pane split_direction="vertical" {
+                pane
+                pane { children; }
+            }
+        }
+        ui max_panes=8 {
+            pane split_direction="vertical" {
+                pane { children; }
+                pane { pane; pane; pane; pane; }
+            }
+        }
+        ui max_panes=12 {
+            pane split_direction="vertical" {
+                pane { children; }
+                pane { pane; pane; pane; pane; }
+                pane { pane; pane; pane; pane; }
+            }
+        }
+    }
+
+    swap_tiled_layout name="horizontal" {
+        ui max_panes=4 {
+            pane
+            pane
+        }
+        ui max_panes=8 {
+            pane {
+                pane split_direction="vertical" { children; }
+                pane split_direction="vertical" { pane; pane; pane; pane; }
+            }
+        }
+    }
+
+    swap_tiled_layout name="stacked" {
+        ui min_panes=4 {
+            pane stacked=true { children; }
+        }
+    }
+
+    swap_tiled_layout name="half-stacked" {
+        ui min_panes=5 {
+            pane split_direction="vertical" {
+                pane
+                pane stacked=true { children; }
             }
         }
     }

@@ -160,6 +160,7 @@ keybinds clear-defaults=true {
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
+        bind "Alt r" { NextSwapLayout; } // "relayout": re-tile panes into the next swap layout
         bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Alt n" { SwitchToMode "tmux"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
