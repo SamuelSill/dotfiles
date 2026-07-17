@@ -522,10 +522,15 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map(']d', vim.diagnostic.goto_next,      'Next diagnostic')
     map('<leader>dd', vim.diagnostic.open_float, 'Show diagnostic under cursor')
 
+    map('<leader>hu', function() vim.lsp.buf.typehierarchy('supertypes') end,
+      'Inheritance tree: base types (up)')
+    map('<leader>hd', function() vim.lsp.buf.typehierarchy('subtypes') end,
+      'Inheritance tree: derived types (down)')
+    map('<leader>hi', fzf.lsp_implementations, 'Implementors of virtual (overrides)')
+
     -- Highlight every occurrence of the symbol under the cursor (LSP document
     -- highlight, VS Code style). Highlights when the cursor rests (updatetime
     -- is 250ms above) and clears the moment it moves.
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client and client.server_capabilities.documentHighlightProvider then
       local grp = vim.api.nvim_create_augroup('lsp_doc_highlight_' .. ev.buf, { clear = true })
       vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
