@@ -773,6 +773,20 @@ if vim.fn.isdirectory(topbar_dir) == 1 then
   require('topbar').setup({ configs = topbar_configs })
 end
 
+-- :Reload — re-source init.lua and re-read the topbar layout, no restart needed.
+-- Re-sourcing re-runs everything here (keymaps, options, the topbar setup above),
+-- and TopbarReload re-reads the JSON on top for good measure.
+vim.api.nvim_create_user_command('Reload', function()
+  local rc = vim.env.MYVIMRC
+  if not rc or rc == '' then rc = vim.fn.stdpath('config') .. '/init.lua' end
+  vim.cmd('source ' .. vim.fn.fnameescape(rc))
+  pcall(vim.cmd, 'TopbarReload')
+  -- Re-sourcing recreates windows (topbar setup), so fzf-lua's cached context
+  -- can point at a now-dead window id — clear it so the next gd/gr recaptures.
+  pcall(function() require('fzf-lua.utils').clear_CTX() end)
+  vim.notify('Reloaded config + topbar')
+end, { desc = 'Reload init.lua and the topbar' })
+
 --------------------------------------------------------------------------------
 -- 7. arrow buttons: disable
 --------------------------------------------------------------------------------
