@@ -666,6 +666,17 @@ map('n', '<leader>dv', function()
   vim.notify('Inline diagnostics ' .. (on and 'OFF' or 'ON'))
 end, { desc = 'Toggle inline diagnostics (virtual text)' })
 
+map('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/]], { desc = 'Substitute word under cursor (file)' })
+map('x', '<A-s>', function()
+  local m = vim.fn.mode()
+  local text = table.concat(vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = m }), '\n')
+  local pat = text:gsub('\\', '\\\\'):gsub('/', '\\/'):gsub('\n', '\\n')
+  -- ':' from visual prefills '<,'>; <C-u> clears it so the substitute spans the
+  -- whole file. `pat` is fed raw (not through replace_termcodes) so a literal
+  -- '<' etc. in the selection stays literal.
+  vim.api.nvim_feedkeys(':' .. vim.keycode('<C-u>') .. '%s/\\V' .. pat .. '/', 'n', false)
+end, { desc = 'Substitute selection (file)' })
+
 -- Git blame / history (gitsigns + fugitive) ----------------------------------
 -- <leader>gb : popup with full blame + diff for the line under the cursor
 -- <leader>gB : toggle GitLens-style inline blame ghost text (follows cursor)
