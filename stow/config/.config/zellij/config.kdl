@@ -144,6 +144,8 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
+        bind "Alt c" { Clear; }
+        bind "Alt e" { EditScrollback; SwitchToMode "normal"; }
         bind "Alt f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
         bind "Alt h" { MoveFocusOrTab "left"; }
         bind "Alt j" { MoveFocus "down"; }
