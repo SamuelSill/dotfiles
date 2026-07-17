@@ -488,6 +488,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
       })
     end, 'Add import for symbol')
 
+    map('<A-f>', function() vim.lsp.buf.format({ async = true }) end, 'Format document')
+    vim.keymap.set('x', '<A-f>', function()
+      local can_range = #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/rangeFormatting' }) > 0
+      if can_range then
+        vim.lsp.buf.format({ async = true })
+      else
+        vim.notify('Range formatting unsupported here', vim.log.levels.INFO)
+      end
+    end, { buffer = ev.buf, desc = 'Format selection' })
+
     -- Switch between a C/C++ source and its header. We call clangd's custom LSP
     -- request directly rather than the :ClangdSwitchSourceHeader user command,
     -- which isn't auto-registered on newer Neovim/lspconfig.

@@ -10,6 +10,7 @@
     "<Esc>": "ESC",
     "<A-J>": "A-S-j",
     "<A-K>": "A-S-k",
+    "<A-f>": "A-f",
     "<S-Tab>": "⇧⇥",
     "<C-Space>": "C-Spc",
     "<C-f>": "C-f",
@@ -64,6 +65,7 @@
     ["<leader>fS", "symbol @ (file)"],
 
     ["<leader>rn", "rename"],
+    ["<A-f>",      "format doc"],
     ["<leader>ca", "code action"],
     ["<leader>ci", "add import"],
     ["<leader>?",  "all keys"],
@@ -109,6 +111,7 @@
       ["~", "toggle case", 1],
       [">", "indent", 1],
       ["<", "unindent", 1],
+      ["<A-f>", "format sel", 1],
 
       ["o", "other end", 2],
       ["i", "inside block", 2],
