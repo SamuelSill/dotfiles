@@ -68,6 +68,9 @@
     ["<leader>ci", "add import"],
     ["<leader>?",  "all keys"],
 
+    ["<leader>dd", "show error"],
+    ["<leader>dv", "toggle inline"],
+
     ["<leader>gb", "blame line"],
     ["<leader>gl", "line history"],
     ["<leader>gc", "line change"],
@@ -95,6 +98,7 @@
     ["<leader>gx", "conflict"],
     ["<leader>h", "hierarchy"],
     ["<leader>y", "yank"],
+    ["<leader>d", "diagnostics"],
     ["<leader>c", "code"]
   ],
 

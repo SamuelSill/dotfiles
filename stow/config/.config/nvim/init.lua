@@ -458,6 +458,11 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
   end,
 })
 
+-- Diagnostics: show the message inline (virtual text) at the end of the line,
+-- always on, in addition to the default signs/underline. Toggle with <leader>dv
+-- (see the global keymaps) when the inline text gets noisy.
+vim.diagnostic.config({ virtual_text = true })
+
 -- Buffer-local keymaps that only exist once a language server attaches.
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
@@ -637,6 +642,14 @@ map({ 'n', 'x', 'o' }, 'L', '$', { desc = 'End of line (like $)' })
 
 -- Show ALL keybindings (searchable full list via fzf-lua):
 map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
+
+-- Toggle inline diagnostics (virtual text) on/off — they're on by default (see
+-- the vim.diagnostic.config above). Signs/underline stay regardless.
+map('n', '<leader>dv', function()
+  local on = vim.diagnostic.config().virtual_text
+  vim.diagnostic.config({ virtual_text = not on })
+  vim.notify('Inline diagnostics ' .. (on and 'OFF' or 'ON'))
+end, { desc = 'Toggle inline diagnostics (virtual text)' })
 
 -- Git blame / history (gitsigns + fugitive) ----------------------------------
 -- <leader>gb : popup with full blame + diff for the line under the cursor
