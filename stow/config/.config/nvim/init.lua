@@ -528,6 +528,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
       'Inheritance tree: derived types (down)')
     map('<leader>hi', fzf.lsp_implementations, 'Implementors of virtual (overrides)')
 
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client and client.server_capabilities.inlayHintProvider then
+      vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+    end
+
     -- Highlight every occurrence of the symbol under the cursor (LSP document
     -- highlight, VS Code style). Highlights when the cursor rests (updatetime
     -- is 250ms above) and clears the moment it moves.
