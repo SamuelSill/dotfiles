@@ -69,10 +69,10 @@
     ["<leader>?",  "all keys"],
 
     ["<leader>gb", "blame line"],
-    ["<leader>gv", "blame column"],
     ["<leader>gl", "line history"],
     ["<leader>gc", "line change"],
     ["<leader>gr", "restore line"],
+    ["<leader>gs", "stage hunk/sel"],
     ["<leader>gxo", "conflict: ours"],
     ["<leader>gxt", "conflict: theirs"],
     ["<leader>gxb", "conflict: both"],

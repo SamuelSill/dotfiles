@@ -696,6 +696,15 @@ map('x', '<leader>gr', function()
   if s > e then s, e = e, s end
   require('gitsigns').reset_hunk({ s, e })
 end, { desc = 'Restore lines (discard changes)' })
+map('n', '<leader>gs', function()
+  require('gitsigns').stage_hunk()
+end, { desc = 'Stage hunk under cursor' })
+map('x', '<leader>gs', function()
+  local s = vim.fn.line('v')
+  local e = vim.fn.line('.')
+  if s > e then s, e = e, s end
+  require('gitsigns').stage_hunk({ s, e })
+end, { desc = 'Stage selected lines' })
 -- Merge conflicts (git-conflict.nvim). Highlighting is automatic in any buffer
 -- containing conflict markers; these commands only act when a conflict exists.
 map('n', ']x', '<cmd>GitConflictNextConflict<cr>', { desc = 'Next git conflict' })
