@@ -570,6 +570,8 @@ map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent fi
 -- style, e.g.  TODO -- *.cc   or   parse -- *.{h,cc} !*test*
 -- (live_grep has glob parsing built in; live_grep_glob is deprecated.)
 map('n', '<leader>fg', fzf.live_grep,            { desc = 'Grep in project (+ file glob)' })
+map('n', '<leader>fs', fzf.lsp_live_workspace_symbols, { desc = 'Find symbol in project (#)' })
+map('n', '<leader>fS', fzf.lsp_document_symbols,       { desc = 'Find symbol in current file (@)' })
 map('n', '<leader>fb', fzf.buffers,              { desc = 'Open buffers' })
 map('n', '<leader>fh', fzf.helptags,             { desc = 'Help tags' })
 -- Jump list back/forward (aliases for native <C-o>/<C-i>, so they can live
