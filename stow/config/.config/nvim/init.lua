@@ -472,6 +472,17 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('K',  vim.lsp.buf.hover,             'Hover docs')
     map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
     map('<leader>ca', vim.lsp.buf.code_action,'Code action')
+
+    map('<leader>ci', function()
+      vim.lsp.buf.code_action({
+        apply = true,
+        filter = function(a)
+          local t = (a.title or ''):lower()
+          return t:find('import', 1, true) ~= nil or t:find('include', 1, true) ~= nil
+        end,
+      })
+    end, 'Add import for symbol')
+
     -- Switch between a C/C++ source and its header. We call clangd's custom LSP
     -- request directly rather than the :ClangdSwitchSourceHeader user command,
     -- which isn't auto-registered on newer Neovim/lspconfig.

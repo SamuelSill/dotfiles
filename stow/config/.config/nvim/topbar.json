@@ -64,6 +64,8 @@
     ["<leader>fS", "symbol @ (file)"],
 
     ["<leader>rn", "rename"],
+    ["<leader>ca", "code action"],
+    ["<leader>ci", "add import"],
     ["<leader>?",  "all keys"],
 
     ["<leader>gb", "blame line"],
@@ -93,7 +95,7 @@
     ["<leader>gx", "conflict"],
     ["<leader>h", "hierarchy"],
     ["<leader>y", "yank"],
-    ["<leader>m", "multicursor"]
+    ["<leader>c", "code"]
   ],
 
   "visual": {
