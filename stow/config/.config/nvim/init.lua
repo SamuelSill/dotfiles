@@ -823,13 +823,6 @@ map('n', '<leader>dv', function()
   vim.notify('Inline diagnostics ' .. (on and 'OFF' or 'ON'))
 end, { desc = 'Toggle inline diagnostics (virtual text)' })
 
-map('n', '<leader>i', function()
-  local buf = 0
-  local on = vim.lsp.inlay_hint.is_enabled({ bufnr = buf })
-  vim.lsp.inlay_hint.enable(not on, { bufnr = buf })
-  vim.notify('Inline type hints ' .. (on and 'OFF' or 'ON'))
-end, { desc = 'Toggle inline type hints' })
-
 map('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/]], { desc = 'Substitute word under cursor (file)' })
 map('x', '<A-s>', function()
   local m = vim.fn.mode()
