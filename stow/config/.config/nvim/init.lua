@@ -659,6 +659,59 @@ end
 map({ 'n', 'x', 'o' }, 'H', smart_home, { expr = true, desc = 'Start of line (smart: non-blank, else col 0)' })
 map({ 'n', 'x', 'o' }, 'L', '$', { desc = 'End of line (like $)' })
 
+do
+  -- Break `s` into lowercase words, understanding all the styles above.
+  local function split_words(s)
+    s = s:gsub('(%l)(%u)', '%1 %2')      -- camelCase boundary:  fooBar → foo Bar
+    s = s:gsub('(%u)(%u%l)', '%1 %2')    -- acronym boundary:    HTTPServer → HTTP Server
+    s = s:gsub('[%-_%s]+', ' ')          -- existing separators → space
+    local words = {}
+    for w in s:gmatch('%S+') do words[#words + 1] = w:lower() end
+    return words
+  end
+
+  local function cap(w) return w:sub(1, 1):upper() .. w:sub(2) end
+
+  local styles = {
+    { name = 'PascalCase', fn = function(w)
+        local out = {} for _, x in ipairs(w) do out[#out + 1] = cap(x) end
+        return table.concat(out)
+      end },
+    { name = 'camelCase', fn = function(w)
+        local out = {} for i, x in ipairs(w) do out[#out + 1] = i == 1 and x or cap(x) end
+        return table.concat(out)
+      end },
+    { name = 'snake_case',  fn = function(w) return table.concat(w, '_') end },
+    { name = 'CONST_CASE',  fn = function(w) return table.concat(w, '_'):upper() end },
+    { name = 'kebab-case',  fn = function(w) return table.concat(w, '-') end },
+  }
+
+  local function change_case()
+    -- Read the LIVE selection ends, not the '</'> marks: those only update on
+    -- leaving visual mode, so mid-mapping they still point at the PREVIOUS
+    -- selection. getpos('v') is the anchor, getpos('.') the cursor; order them.
+    local a, b = vim.fn.getpos('v'), vim.fn.getpos('.')
+    if a[2] > b[2] or (a[2] == b[2] and a[3] > b[3]) then a, b = b, a end
+    local sr, sc, er, ec = a[2] - 1, a[3] - 1, b[2] - 1, b[3] - 1
+    local last = vim.api.nvim_buf_get_lines(0, er, er + 1, true)[1]
+    ec = math.min(ec, #last - 1)                         -- clamp $-past-EOL / v:maxcol
+    ec = ec + #(vim.fn.matchstr(last:sub(ec + 1), '.'))  -- inclusive → exclusive (multibyte-safe)
+
+    local words = split_words(table.concat(vim.api.nvim_buf_get_text(0, sr, sc, er, ec, {}), ' '))
+    if #words == 0 then return end
+
+    vim.ui.select(styles, {
+      prompt = 'Change case:',
+      format_item = function(item) return item.fn(words) .. '   (' .. item.name .. ')' end,
+    }, function(choice)
+      if not choice then return end
+      vim.api.nvim_buf_set_text(0, sr, sc, er, ec, { choice.fn(words) })
+    end)
+  end
+
+  map('x', '<A-c>', change_case, { desc = 'Change case of selection (Pascal/camel/snake/CONST/kebab)' })
+end
+
 -- Show ALL keybindings (searchable full list via fzf-lua):
 map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
 
