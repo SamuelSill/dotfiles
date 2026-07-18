@@ -602,6 +602,71 @@ map('n', '<leader>fh', fzf.helptags,             { desc = 'Help tags' })
 -- under the topbar's "goto" (g) submenu). VS Code's Alt-Left / Alt-Right.
 map('n', 'g[', '<C-o>', { desc = 'Jump back' })
 map('n', 'g]', '<C-i>', { desc = 'Jump forward' })
+
+do
+  -- Declaration node types (NOT their bodies), across common grammars.
+  local BLOCK = {
+    -- functions / methods
+    function_item = true, function_definition = true, function_declaration = true,
+    method_definition = true, method_declaration = true, constructor_declaration = true,
+    local_function = true, arrow_function = true, function_expression = true,
+    -- types / containers
+    struct_item = true, struct_specifier = true, struct_declaration = true,
+    class_declaration = true, class_definition = true, class_specifier = true,
+    enum_item = true, enum_specifier = true, enum_declaration = true,
+    union_item = true, union_specifier = true,
+    interface_declaration = true, trait_item = true,
+    -- namespaces / modules
+    namespace_definition = true, mod_item = true, module = true,
+    -- impl / type aliases / macros
+    impl_item = true, type_item = true, type_alias_declaration = true,
+    type_definition = true, macro_definition = true,
+  }
+  -- The name identifier of a declaration node. Most grammars expose a `name`
+  -- field; rust `impl` blocks name a target type instead; C/C++ nest the name
+  -- in the declarator chain (function_/pointer_/reference_declarator).
+  local function name_node(node)
+    if node:type():find('impl', 1, true) then               -- impl Trait for Foo → Foo
+      return node:field('type')[1] or node:field('trait')[1]
+    end
+    local named = node:field('name')[1]
+    if named then return named end
+    local decl = node:field('declarator')[1]
+    while decl do
+      local t = decl:type()
+      if t == 'qualified_identifier' then                   -- C++ Foo::bar → bar
+        return decl:field('name')[1] or decl
+      elseif t:find('identifier', 1, true) or t == 'operator_name' or t == 'destructor_name' then
+        return decl
+      end
+      decl = decl:field('declarator')[1]
+    end
+    return nil
+  end
+  local function node_at_cursor()
+    local ok, node = pcall(vim.treesitter.get_node)
+    return ok and node or nil
+  end
+  map('n', 'gb', function()
+    local node = node_at_cursor()
+    if not node then                                        -- tree not parsed yet
+      pcall(function() vim.treesitter.get_parser():parse() end)
+      node = node_at_cursor()
+    end
+    while node do
+      if BLOCK[node:type()] then
+        local r, c = (name_node(node) or node):start()      -- name if found, else decl start
+        vim.cmd("normal! m'")                                -- record jump for <C-o>
+        vim.api.nvim_win_set_cursor(0, { r + 1, c })
+        vim.cmd('normal! zz')
+        return
+      end
+      node = node:parent()
+    end
+    vim.notify('No enclosing block', vim.log.levels.INFO)
+  end, { desc = 'Jump to enclosing block name (fn/class/struct/…)' })
+end
+
 -- Move focus between windows/splits without the <C-w> prefix (e.g. hop between
 -- the nvim-tree sidebar and your code). <C-w>hjkl still works too.
 map('n', '<C-h>', '<C-w>h', { desc = 'Focus window left' })

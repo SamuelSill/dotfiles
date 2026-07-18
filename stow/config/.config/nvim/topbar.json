@@ -52,7 +52,8 @@
     ["gi", "impl"],
     ["g[", "back"],
     ["g]", "forward"],
-    ["gh",         "hdr/src"],
+    ["gh", "hdr/src"],
+    ["gb", "block name"],
 
     ["<leader>e",  "explorer"],
     ["<leader>q",  "quit"],
