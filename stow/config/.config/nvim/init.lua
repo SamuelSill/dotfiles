@@ -712,6 +712,41 @@ do
   map('x', '<A-c>', change_case, { desc = 'Change case of selection (Pascal/camel/snake/CONST/kebab)' })
 end
 
+do
+  local brackets = {
+    ['('] = { '(', ')' }, [')'] = { '(', ')' },
+    ['['] = { '[', ']' }, [']'] = { '[', ']' },
+    ['{'] = { '{', '}' }, ['}'] = { '{', '}' },
+    ['<'] = { '<', '>' }, ['>'] = { '<', '>' },
+    ['"'] = { '"', '"' }, ["'"] = { "'", "'" }, ['`'] = { '`', '`' },
+  }
+
+  local function surround()
+    -- Capture the selection range first (same multibyte-safe logic as <A-c>),
+    -- since reading the pair char below must not depend on the live selection.
+    local a, b = vim.fn.getpos('v'), vim.fn.getpos('.')
+    if a[2] > b[2] or (a[2] == b[2] and a[3] > b[3]) then a, b = b, a end
+    local sr, sc, er, ec = a[2] - 1, a[3] - 1, b[2] - 1, b[3] - 1
+    local last = vim.api.nvim_buf_get_lines(0, er, er + 1, true)[1]
+    ec = math.min(ec, #last - 1)
+    ec = ec + #(vim.fn.matchstr(last:sub(ec + 1), '.'))
+
+    local ok, ch = pcall(vim.fn.getcharstr)          -- which pair to use
+    if not ok or ch == '' or ch == vim.keycode('<Esc>') then return end
+    local pair = brackets[ch]
+    if not pair then return end                      -- unknown char: no-op
+    local open, close = pair[1], pair[2]
+
+    local lines = vim.api.nvim_buf_get_text(0, sr, sc, er, ec, {})
+    lines[1] = open .. lines[1]
+    lines[#lines] = lines[#lines] .. close
+    vim.api.nvim_buf_set_text(0, sr, sc, er, ec, lines)
+    vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'n', false)   -- back to normal mode
+  end
+
+  map('x', 's', function() surround() end, { desc = "Surround selection tight: s then ( { [ < \" ' `" })
+end
+
 -- Show ALL keybindings (searchable full list via fzf-lua):
 map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
 

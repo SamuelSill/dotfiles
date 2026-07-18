@@ -114,6 +114,7 @@
       ["<", "unindent", 1],
       ["<A-f>", "format sel", 1],
       ["<A-s>", "sub sel", 1],
+      ["s", "surround +pair", 1],
 
       ["o", "other end", 2],
       ["i", "inside block", 2],
