@@ -366,8 +366,9 @@ default_shell "zsh"
 // Options:
 //   - detach (Default)
 //   - quit
-// 
-// on_force_close "quit"
+//
+// Window close (SIGHUP) terminates the session; explicit detach still keeps it.
+on_force_close "quit"
  
 // Configure the scroll back buffer size
 // This is the number of lines zellij stores for each pane in the scroll back
