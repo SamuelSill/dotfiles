@@ -457,6 +457,7 @@ def main():
     install_deps()
     step("Deploying config via stow")
     deploy_pkg(DOTFILES_DIR, "config")
+    deploy_pkg(DOTFILES_DIR, "claude")
     if os.environ.get("DOTFILES_SKIP_SHELL"):
         warn("DOTFILES_SKIP_SHELL set; leaving ~/.zshrc hook to the wrapper installer")
     else:
