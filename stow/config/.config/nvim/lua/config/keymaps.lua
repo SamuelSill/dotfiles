@@ -7,8 +7,8 @@ local fzf = require('fzf-lua')
 local lsp = require('config.lsp')
 
 map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (reveal current file)' })
-map('n', 'gd', lsp.smart_goto_definition, { desc = 'Goto definition / file under cursor' })
-map('n', 'gr', lsp.smart_references, { desc = 'Goto references' })
+map('n', '<M-d>', lsp.smart_goto_definition, { desc = 'Goto definition / file under cursor' })
+map('n', '<M-r>', lsp.smart_references, { desc = 'Goto references' })
 
 -- Find-files with recently-visited files floated to the top: prepend this cwd's
 -- :oldfiles entries to fd's stream, dedupe (recents win), and break fzf score
@@ -41,9 +41,9 @@ map('n', '<leader>fs', fzf.lsp_live_workspace_symbols, { desc = 'Find symbol in 
 map('n', '<leader>fS', fzf.lsp_document_symbols,       { desc = 'Find symbol in current file (@)' })
 map('n', '<leader>fb', fzf.buffers,              { desc = 'Open buffers' })
 map('n', '<leader>fh', fzf.helptags,             { desc = 'Help tags' })
--- Aliases for <C-o>/<C-i> so they can live under the topbar's "goto" (g) submenu.
-map('n', 'g[', '<C-o>', { desc = 'Jump back' })
-map('n', 'g]', '<C-i>', { desc = 'Jump forward' })
+-- Jumplist back/forward: alt-[ / alt-] alias <C-o>/<C-i>.
+map('n', '<M-[>', '<C-o>', { desc = 'Jump back' })
+map('n', '<M-]>', '<C-i>', { desc = 'Jump forward' })
 
 do
   -- Declaration node types (not their bodies) across common grammars.
@@ -84,7 +84,7 @@ do
     local ok, node = pcall(vim.treesitter.get_node)
     return ok and node or nil
   end
-  map('n', 'gb', function()
+  map('n', '<M-b>', function()
     local node = node_at_cursor()
     if not node then                                        -- tree not parsed yet
       pcall(function() vim.treesitter.get_parser():parse() end)

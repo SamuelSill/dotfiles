@@ -1,5 +1,5 @@
 {
-  "triggers": ["<leader>", "g"],
+  "triggers": ["<leader>"],
   "branch_marker": ":",
   "breadcrumb_separator": "▏",
 
@@ -23,8 +23,6 @@
   },
 
   "bindings": [
-    ["gb", "block name"],
-
     ["<leader>fg", "grep (+glob)"],
     ["<leader>fr", "find/replace"],
     ["<leader>fb", "open files"],
@@ -58,7 +56,6 @@
 
   "groups": [
     ["<leader>",  "menu", 0],
-    ["g",         "goto", 0],
     ["<leader>f", "find"],
     ["<leader>r", "rename"],
     ["<leader>g", "git"],

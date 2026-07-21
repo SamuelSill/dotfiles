@@ -126,9 +126,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set('n', lhs, rhs, { buffer = ev.buf, desc = desc })
     end
     local fzf = require('fzf-lua')
-    map('gd', smart_goto_definition,         'Goto definition / file under cursor')
-    map('gD', vim.lsp.buf.declaration,       'Goto declaration')
-    map('gr', smart_references,              'Goto references')
+    map('<M-d>', smart_goto_definition,      'Goto definition / file under cursor')
+    map('<M-r>', smart_references,           'Goto references')
     map('K',  vim.lsp.buf.hover,             'Hover docs')
     map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
     map('<leader>ca', vim.lsp.buf.code_action,'Code action')
