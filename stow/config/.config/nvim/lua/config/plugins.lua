@@ -49,7 +49,7 @@ require('lazy').setup({
       -- runs file_edit_or_qf and dumps the paths into a quickfix window instead
       -- of just opening the one entry.
       require('fzf-lua').setup({
-        fzf_opts = { ['--cycle'] = true },
+        fzf_opts = { ['--cycle'] = true, ['-i'] = true },
         keymap = {
           fzf = {
             true,
@@ -66,6 +66,8 @@ require('lazy').setup({
         },
         grep = {
           fzf_opts = { ['--multi'] = false, ['--cycle'] = true },
+          rg_opts = '--column --line-number --no-heading --color=always '
+            .. '--ignore-case --max-columns=4096 -e',
         },
       })
 
@@ -110,7 +112,7 @@ require('lazy').setup({
       { '<leader>fr', ":<C-u>lua require('grug-far').with_visual_selection()<CR>",
         mode = 'x', desc = 'Find & replace (selection)' },
     },
-    opts = {},
+    opts = { prefills = { flags = '--ignore-case' } },
   },
 
   -- The `main` branch: `master` caps below Neovim 0.12 and crashes its query
