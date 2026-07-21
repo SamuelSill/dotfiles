@@ -118,5 +118,9 @@
   {
     "name": "vi",
     "command": "nvim"
+  },
+  {
+    "name": "zellij-a",
+    "command": "session=$(zellij ls -s | fzf --preview \"\\\"$DOTFILES_DIR/setup/zellij-preview.py\\\" {}\") && [ -n \"$session\" ] && zellij a \"$session\""
   }
 ]
