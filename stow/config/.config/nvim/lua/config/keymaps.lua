@@ -37,6 +37,7 @@ map('n', '<C-p>',      find_files_recent_first,  { desc = 'Find files (recent fi
 map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent first)' })
 -- Grep supports a trailing ` -- <glob>` file filter, e.g.  TODO -- *.{h,cc} !*test*
 map('n', '<leader>fg', fzf.live_grep,            { desc = 'Grep in project (+ file glob)' })
+map('x', '<leader>fg', fzf.grep_visual,          { desc = 'Grep selection in project' })
 map('n', '<leader>fs', fzf.lsp_live_workspace_symbols, { desc = 'Find symbol in project (#)' })
 map('n', '<leader>fS', fzf.lsp_document_symbols,       { desc = 'Find symbol in current file (@)' })
 map('n', '<leader>fb', fzf.buffers,              { desc = 'Open buffers' })
