@@ -45,6 +45,9 @@ require('lazy').setup({
     'ibhagwan/fzf-lua',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+      vim.g.fzf_history_dir = vim.fn.stdpath('state') .. '/fzf-lua-history'
+      vim.fn.mkdir(vim.g.fzf_history_dir, 'p')
+
       -- --multi is off for files/lsp/grep: with it on, a >1 selection on <CR>
       -- runs file_edit_or_qf and dumps the paths into a quickfix window instead
       -- of just opening the one entry.
@@ -55,6 +58,10 @@ require('lazy').setup({
             true,
             ['tab']       = 'down',
             ['shift-tab'] = 'up',
+            ['alt-[']     = 'prev-history',
+            ['alt-]']     = 'next-history',
+            ['ctrl-p']    = 'up',
+            ['ctrl-n']    = 'down',
           },
         },
         files = {
