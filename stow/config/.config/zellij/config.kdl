@@ -67,7 +67,7 @@ keybinds clear-defaults=true {
         bind "j" { Resize "Increase down"; }
         bind "k" { Resize "Increase up"; }
         bind "l" { Resize "Increase right"; }
-        bind "Ctrl n" { SwitchToMode "normal"; }
+        bind "Ctrl z" { SwitchToMode "normal"; }
     }
     move {
         bind "left" { MovePane "left"; }
@@ -75,7 +75,7 @@ keybinds clear-defaults=true {
         bind "up" { MovePane "up"; }
         bind "right" { MovePane "right"; }
         bind "h" { MovePane "left"; }
-        bind "Ctrl h" { SwitchToMode "normal"; }
+        bind "Ctrl m" { SwitchToMode "normal"; }
         bind "j" { MovePane "down"; }
         bind "k" { MovePane "up"; }
         bind "l" { MovePane "right"; }
@@ -158,15 +158,11 @@ keybinds clear-defaults=true {
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
         bind "Alt =" { Resize "Increase"; }
-        bind "Alt [" { PreviousSwapLayout; }
-        bind "Alt ]" { NextSwapLayout; }
-        bind "Alt r" { NextSwapLayout; } // "relayout": re-tile panes into the next swap layout
+        bind "Ctrl Alt r" { NextSwapLayout; } // "relayout": re-tile panes into the next swap layout
         bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Alt n" { SwitchToMode "tmux"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Alt w" { CloseFocus; }
-        bind "Alt d" { Detach; }
-        bind "Alt q" { Quit; }
         bind "Ctrl q" { Quit; }
         bind "Alt 1" { GoToTab 1; }
         bind "Alt 2" { GoToTab 2; }
@@ -179,22 +175,24 @@ keybinds clear-defaults=true {
         bind "Alt 9" { GoToTab 9; }
     }
     shared_except "locked" "move" {
-        bind "Ctrl h" { SwitchToMode "move"; }
+        bind "Ctrl m" { SwitchToMode "move"; }
     }
     shared_except "locked" "session" {
         bind "Ctrl o" { SwitchToMode "session"; }
     }
     shared_except "locked" "scroll" "search" {
-        bind "Ctrl s" { SwitchToMode "scroll"; }
+        bind "Ctrl f" { SwitchToMode "scroll"; }
     }
-    shared_except "locked" "tab" {
-        bind "Ctrl t" { SwitchToMode "tab"; }
+    // Rename directly instead of entering pane/tab mode first (those modes are
+    // no longer reachable — their Ctrl p / Ctrl t entries are gone).
+    shared_except "locked" "renamepane" {
+        bind "Ctrl Shift r" { SwitchToMode "renamepane"; PaneNameInput 0; }
     }
-    shared_except "locked" "pane" {
-        bind "Ctrl p" { SwitchToMode "pane"; }
+    shared_except "locked" "renametab" {
+        bind "Ctrl t" { SwitchToMode "renametab"; TabNameInput 0; }
     }
     shared_except "locked" "resize" {
-        bind "Ctrl n" { SwitchToMode "resize"; }
+        bind "Ctrl z" { SwitchToMode "resize"; }
     }
     shared_except "normal" "locked" "entersearch" {
         bind "enter" { SwitchToMode "normal"; }
@@ -215,12 +213,11 @@ keybinds clear-defaults=true {
         bind "Ctrl b" { PageScrollUp; }
         bind "Ctrl c" { ScrollToBottom; SwitchToMode "normal"; }
         bind "d" { HalfPageScrollDown; }
-        bind "Ctrl f" { PageScrollDown; }
         bind "h" { PageScrollUp; }
         bind "j" { ScrollDown; }
         bind "k" { ScrollUp; }
         bind "l" { PageScrollDown; }
-        bind "Ctrl s" { SwitchToMode "normal"; }
+        bind "Ctrl f" { SwitchToMode "normal"; }
         bind "u" { HalfPageScrollUp; }
     }
     entersearch {
@@ -229,13 +226,13 @@ keybinds clear-defaults=true {
         bind "enter" { SwitchToMode "search"; }
     }
     renametab {
-        bind "esc" { UndoRenameTab; SwitchToMode "tab"; }
+        bind "esc" { UndoRenameTab; SwitchToMode "normal"; }
     }
     shared_among "renametab" "renamepane" {
         bind "Ctrl c" { SwitchToMode "normal"; }
     }
     renamepane {
-        bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
+        bind "esc" { UndoRenamePane; SwitchToMode "normal"; }
     }
     // Repurposed "tmux" mode slot as a "create" section (entered via Alt n).
     // Note: zellij has a fixed set of modes, so the status bar still labels this "TMUX".
