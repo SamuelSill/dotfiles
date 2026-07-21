@@ -51,7 +51,9 @@
     ["<leader>hi", "implementors"],
 
     ["<leader>yp", "rel path"],
-    ["<leader>yP", "full path"]
+    ["<leader>yP", "full path"],
+    ["<leader>yl", "rel path +line"],
+    ["<leader>yL", "full path +line"]
   ],
 
   "groups": [
