@@ -133,14 +133,14 @@ require('lazy').setup({
     config = function()
       -- markdown needs BOTH parsers: block structure + inline spans.
       require('nvim-treesitter').install({
-        'c', 'cpp', 'lua', 'python', 'rust', 'bash', 'json',
+        'c', 'cpp', 'c_sharp', 'lua', 'python', 'rust', 'bash', 'json',
         'markdown', 'markdown_inline',
       })
 
       -- `main` doesn't auto-enable highlighting; turn it on per-filetype, skipping
       -- huge generated files.
       vim.api.nvim_create_autocmd('FileType', {
-        pattern = { 'c', 'cpp', 'lua', 'python', 'rust', 'sh', 'bash', 'json',
+        pattern = { 'c', 'cpp', 'cs', 'lua', 'python', 'rust', 'sh', 'bash', 'json',
                     'markdown' },
         callback = function(ev)
           local name = vim.api.nvim_buf_get_name(ev.buf)
@@ -174,7 +174,7 @@ require('lazy').setup({
   {
     'williamboman/mason-lspconfig.nvim',
     dependencies = { 'williamboman/mason.nvim', 'neovim/nvim-lspconfig' },
-    opts = { ensure_installed = { 'pyright', 'rust_analyzer' } },
+    opts = { ensure_installed = { 'pyright', 'rust_analyzer', 'omnisharp' } },
   },
 
   {

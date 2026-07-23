@@ -26,7 +26,7 @@ vim.lsp.config('rust_analyzer', {
   },
 })
 
-vim.lsp.enable({ 'clangd', 'pyright', 'rust_analyzer' })
+vim.lsp.enable({ 'clangd', 'pyright', 'rust_analyzer', 'omnisharp' })
 
 -- Re-apply on ColorScheme so the symbol-under-cursor highlight survives a theme switch.
 local function set_reference_hl()
