@@ -221,6 +221,28 @@ def setup_fd():
             warn("linked fdfind -> ~/.local/bin/fd (ensure ~/.local/bin is on PATH)")
 
 
+def setup_bat():
+    """Debian names the binary 'batcat'; our aliases call 'bat'. Ensure a 'bat' on PATH.
+    bat syntax-highlights piped output (e.g. the dlp-agent remote build's Rust errors)."""
+    if have("bat"):
+        ok("bat")
+        return
+    step("Installing bat")
+    pm_install({"brew": "bat", "apt": "bat", "dnf": "bat", "pacman": "bat"}[pkg_manager()])
+    if have("bat"):
+        ok("bat")
+        return
+    if have("batcat"):
+        src = shutil.which("batcat")
+        if os.access("/usr/local/bin", os.W_OK) or sudo_prefix():
+            run(sudo_prefix() + ["ln", "-sf", src, "/usr/local/bin/bat"])
+            ok("linked batcat -> /usr/local/bin/bat")
+        else:
+            (Path.home() / ".local/bin").mkdir(parents=True, exist_ok=True)
+            run(["ln", "-sf", src, str(Path.home() / ".local/bin/bat")])
+            warn("linked batcat -> ~/.local/bin/bat (ensure ~/.local/bin is on PATH)")
+
+
 def setup_clangd():
     """The general nvim config configures clangd as the C/C++ LSP."""
     if have("clangd"):
@@ -434,6 +456,7 @@ def install_deps():
     step(f"Platform: {OS}   package manager: {pkg_manager()}")
     core_tools()
     setup_fd()
+    setup_bat()
     setup_clangd()
     setup_tree_sitter()
     setup_pyenv()
