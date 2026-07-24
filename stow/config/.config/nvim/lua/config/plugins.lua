@@ -12,7 +12,31 @@ require('lazy').setup({
   {
     'folke/tokyonight.nvim',
     priority = 1000,
-    config = function() vim.cmd.colorscheme('tokyonight-night') end,
+    config = function()
+      require('tokyonight').setup({
+        style = 'night',
+        -- on_colors runs after tokyonight derives every bg_* from bg/bg_dark, so
+        -- each background must be set explicitly or it keeps the stock value.
+        on_colors = function(c)
+          c.bg           = '#0d0e14'
+          c.bg_dark      = '#08090d'
+          c.bg_dark1     = '#050508'
+          c.bg_popup     = '#08090d'
+          c.bg_statusline = '#08090d'
+          c.bg_sidebar   = '#08090d'
+          c.bg_float     = '#08090d'
+          c.bg_visual    = '#2a3158'
+          c.bg_search    = '#2a3158'
+          c.black        = '#000000'
+          c.border       = '#3b4261'
+          -- Brighter fg + comments to lift contrast against the darker canvas.
+          c.fg           = '#d4dbf7'
+          c.fg_dark      = '#b4bce0'
+          c.comment      = '#7a83ad'
+        end,
+      })
+      vim.cmd.colorscheme('tokyonight-night')
+    end,
   },
 
   {
