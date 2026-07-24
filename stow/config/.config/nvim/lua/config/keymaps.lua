@@ -5,6 +5,7 @@
 local map = vim.keymap.set
 local fzf = require('fzf-lua')
 local lsp = require('config.lsp')
+local ai = require('config.ai')
 
 map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (reveal current file)' })
 map('n', '<M-d>', lsp.smart_goto_definition, { desc = 'Goto definition / file under cursor' })
@@ -230,6 +231,8 @@ do
 
   map('x', 's', function() surround() end, { desc = "Surround selection tight: s then ( { [ < \" ' `" })
 end
+
+map({ 'n', 'x' }, '<M-a>', ai.ask, { desc = 'Ask claude about line / selection' })
 
 map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
 

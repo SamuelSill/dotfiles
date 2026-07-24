@@ -4,6 +4,7 @@
   "breadcrumb_separator": "▏",
 
   "pretty": {
+    "<A-a>": "A-a",
     "<A-c>": "A-c",
     "<A-s>": "A-s",
     "<C-l>": "C-l",
@@ -70,6 +71,7 @@
 
   "visual": {
     "bindings": [
+      ["<A-a>", "ask claude", 1],
       ["~", "toggle case", 1],
       ["<A-c>", "change case", 1],
       ["<A-s>", "sub sel", 1],
