@@ -50,11 +50,47 @@ local function open_if_readable(path)
   return false
 end
 
+-- Ask each attached server for the symbol's definition and pivot: if one of the
+-- results is the location we're already sitting on (a variable resting on its own
+-- definition), jump to that variable's *type* definition instead; otherwise open
+-- the usual definitions picker. Line-based containment is enough — a definition's
+-- name lives on a single line.
+local function lsp_definition_or_typedef()
+  local fzf = require('fzf-lua')
+  local buf_uri = vim.uri_from_bufnr(0)
+  local cur_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local params = {
+    textDocument = vim.lsp.util.make_text_document_params(0),
+    position = { line = cur_line, character = vim.api.nvim_win_get_cursor(0)[2] },
+  }
+
+  vim.lsp.buf_request_all(0, 'textDocument/definition', params, function(results)
+    local on_def = false
+    for _, res in pairs(results or {}) do
+      local r = res.result
+      local locs = (r == nil) and {} or ((r.uri or r.targetUri) and { r } or r)
+      for _, loc in ipairs(locs) do
+        local rng = loc.targetSelectionRange or loc.targetRange or loc.range
+        if (loc.targetUri or loc.uri) == buf_uri and rng
+           and cur_line >= rng.start.line and cur_line <= rng['end'].line then
+          on_def = true
+        end
+      end
+    end
+    if on_def then
+      fzf.lsp_typedefs({ jump1 = true })
+    else
+      fzf.lsp_definitions({ jump1 = true })
+    end
+  end)
+end
+
 -- gd that works in every buffer, trying in order:
 --   1. "//path" (GN/Bazel source-root notation) resolved from the workspace root
 --      (.gn marker, else git root); a bare "//dir" falls back to its BUILD.gn.
 --   2. a path-looking <cfile> that resolves to a real file (&path + sibling dir).
---   3. LSP definition, if a server is attached.
+--   3. LSP definition (fzf-lua picker) if a server is attached — or, when already
+--      on the definition, the type's definition (see lsp_definition_or_typedef).
 --   4. Vim's built-in gd.
 -- The path-looking guard (a slash or a .ext) stops it opening a stray file when
 -- the cursor is on a plain symbol.
@@ -81,7 +117,10 @@ local function smart_goto_definition()
     end
   end
   if #vim.lsp.get_clients({ bufnr = 0 }) > 0 then
-    vim.lsp.buf.definition()
+    -- fzf-lua picker (not vim.lsp.buf.definition): jump1 goes straight to a lone
+    -- result, and the picker closes on selection instead of leaving the default
+    -- handler's quickfix window open behind you.
+    lsp_definition_or_typedef()
   else
     vim.cmd('normal! gd')
   end
@@ -96,7 +135,7 @@ local function smart_references()
   local fzf = require('fzf-lua')
   for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
     if client.server_capabilities.referencesProvider then
-      fzf.lsp_references()
+      fzf.lsp_references({ jump1 = true })
       return
     end
   end
@@ -180,7 +219,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
       'Inheritance tree: base types (up)')
     map('<leader>hd', function() vim.lsp.buf.typehierarchy('subtypes') end,
       'Inheritance tree: derived types (down)')
-    map('<leader>hi', fzf.lsp_implementations, 'Implementors of virtual (overrides)')
+    map('<leader>hi', function() fzf.lsp_implementations({ jump1 = true }) end,
+      'Implementors of virtual (overrides)')
 
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client and client.server_capabilities.inlayHintProvider then
