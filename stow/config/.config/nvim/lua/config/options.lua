@@ -17,6 +17,9 @@ opt.undofile = true
 opt.splitright = true
 opt.splitbelow = true
 opt.cursorline = true
+opt.wrap = true
+opt.linebreak = true
+opt.breakindent = true
 -- Indentation width (expandtab/shiftwidth/tabstop) intentionally left at Neovim
 -- defaults here; project-specific styles come from a local override.
 

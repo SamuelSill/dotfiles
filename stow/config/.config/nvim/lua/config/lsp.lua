@@ -129,7 +129,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('<M-d>', smart_goto_definition,      'Goto definition / file under cursor')
     map('<M-r>', smart_references,           'Goto references')
     map('K',  vim.lsp.buf.hover,             'Hover docs')
-    map('<leader>rn', vim.lsp.buf.rename,    'Rename symbol')
+    map('<leader>cr', vim.lsp.buf.rename,    'Rename symbol')
     map('<leader>ca', vim.lsp.buf.code_action,'Code action')
 
     map('<leader>ci', function()

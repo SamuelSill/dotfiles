@@ -29,7 +29,7 @@
     ["<leader>fs", "symbol (project)"],
     ["<leader>fS", "symbol (file)"],
 
-    ["<leader>rn", "rename"],
+    ["<leader>cr", "rename"],
     ["<leader>ca", "code action"],
     ["<leader>ci", "add import"],
 
@@ -59,7 +59,6 @@
   "groups": [
     ["<leader>",  "menu", 0],
     ["<leader>f", "find"],
-    ["<leader>r", "rename"],
     ["<leader>g", "git"],
     ["<leader>gx", "conflict"],
     ["<leader>h", "hierarchy"],
