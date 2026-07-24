@@ -74,7 +74,7 @@ require('lazy').setup({
         grep = {
           fzf_opts = { ['--multi'] = false, ['--cycle'] = true },
           rg_opts = '--column --line-number --no-heading --color=always '
-            .. '--ignore-case --max-columns=4096 -e',
+            .. '--ignore-case --hidden --glob=!.git/ --max-columns=4096 -e',
         },
       })
 
