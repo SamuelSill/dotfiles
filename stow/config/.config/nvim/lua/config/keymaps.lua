@@ -130,7 +130,6 @@ map('n', '<leader>yL', function()
   vim.notify('Copied path: ' .. abs)
 end, { desc = 'Copy full (absolute) path with line number' })
 map('n', '<leader>w',  '<cmd>write<cr>',         { desc = 'Save file' })
-map({ 'n', 'i', 'x' }, '<C-s>', '<cmd>write<cr>', { desc = 'Save file' })
 map('n', '<leader>q',  '<cmd>quit<cr>',          { desc = 'Quit window' })
 map('n', '<Esc>',      '<cmd>nohlsearch<cr>',    { desc = 'Clear search highlight' })
 
