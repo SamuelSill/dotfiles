@@ -27,5 +27,6 @@
     "type": "command",
     "command": ". ${DOTFILES_DIR}/claude/statusline.sh",
     "padding": 2
-  }
+  },
+  "editorMode": "vim"
 }
