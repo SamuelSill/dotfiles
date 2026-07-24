@@ -1,0 +1,123 @@
+{
+  "title": "zellij keybindings",
+  "footer": "press any key to close",
+
+  "highlights": {
+    "title":  { "fg": "#b4befe", "bold": true },
+    "footer": { "fg": "#a6adc8" },
+    "badge":  { "fg": "#11111b", "bold": true },
+    "key":    { "fg": "#a6e3a1", "bold": true },
+    "desc":   { "fg": "#cdd6f4" },
+    "note":   { "fg": "#a6adc8" }
+  },
+
+  "band": { "bg": "#2b3a55", "bg_alt": "#3a4d73" },
+
+  "sections": [
+    {
+      "title": "NORMAL · ALT",
+      "color": "#89b4fa",
+      "note": "keys in NORMAL are Alt-prefixed",
+      "items": [
+        ["h j k l", "focus"],
+        ["1-9", "tab"],
+        ["n", "create menu"],
+        ["w", "close pane"],
+        ["f", "fullscreen"],
+        ["C-A-r", "relayout"],
+        ["+ / -", "resize"],
+        ["c", "clear"],
+        ["e", "edit scrollback"],
+        ["C-q", "quit"],
+        ["Shift p", "group mark"]
+      ]
+    },
+    {
+      "title": "NORMAL · CTRL — enter a mode",
+      "color": "#cba6f7",
+      "band": { "bg": "#3b2f52", "bg_alt": "#4f3f6e" },
+      "items": [
+        ["C-h", "move"],
+        ["C-r", "rename pane"],
+        ["C-t", "rename tab"],
+        ["C-z", "resize"],
+        ["C-f", "scroll"],
+        ["C-o", "session"],
+        ["C-g", "lock"]
+      ]
+    },
+    {
+      "title": "CREATE — Alt n",
+      "color": "#a6e3a1",
+      "items": [
+        ["h j k l", "split L/D/U/R"],
+        ["s", "stacked"],
+        ["t", "new tab"],
+        ["x", "close"]
+      ]
+    },
+    {
+      "title": "MOVE — Ctrl h",
+      "color": "#f9e2af",
+      "items": [
+        ["h j k l", "move pane"],
+        [", .", "move tab"],
+        ["d", "pane → new tab"],
+        ["n / p", "reorder"]
+      ]
+    },
+    {
+      "title": "RESIZE — Ctrl z",
+      "color": "#94e2d5",
+      "items": [
+        ["h j k l", "grow L/D/U/R"],
+        ["H J K L", "shrink"],
+        ["+ / -", "grow / shrink"]
+      ]
+    },
+    {
+      "title": "SCROLL — Ctrl f",
+      "color": "#a6adc8",
+      "items": [
+        ["j / k", "line"],
+        ["d / u", "half page"],
+        ["l / C-b", "page down / up"],
+        ["e", "edit buffer"],
+        ["s", "search"],
+        ["C-f / esc", "exit"],
+        ["C-c", "bottom & exit"]
+      ]
+    },
+    {
+      "title": "SEARCH — s in scroll",
+      "color": "#a6adc8",
+      "items": [
+        ["n / p", "next / prev"],
+        ["c", "case"],
+        ["o", "whole word"],
+        ["w", "wrap"]
+      ]
+    },
+    {
+      "title": "SESSION — Ctrl o",
+      "color": "#f5c2e7",
+      "items": [
+        ["w", "sessions"],
+        ["d", "detach"],
+        ["a", "about"],
+        ["c", "config"],
+        ["p", "plugins"],
+        ["l", "layouts"],
+        ["s", "share"]
+      ]
+    },
+    {
+      "title": "GLOBAL",
+      "color": "#b4befe",
+      "items": [
+        ["C-g", "lock / unlock"],
+        ["esc / enter", "back to normal"]
+      ]
+    }
+  ]
+}

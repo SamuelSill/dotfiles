@@ -1,7 +1,7 @@
 // Custom default layout — replaces Zellij's built-in bars with zjstatus:
-//   TOP bar:     tabs (left) · clock (center) · session (right)
-//   BOTTOM bar:  a mode badge + shortcut hints, shown only for the modes we
-//                configure below; the rest get a badge only (no hint clutter).
+//   TOP bar:     tabs (left) · clock (center) · current-mode pill (right)
+//                The active tab turns teal while a pane is fullscreen (zoomed),
+//                so the bottom row can stay free.
 //
 // zjstatus is downloaded + cached from its GitHub release on first run (needs
 // network the first time). Pinned to v0.24.0; bump the URL to update.
@@ -18,12 +18,32 @@ layout {
                 format_space  "#[bg=#181825]"
                 format_left   "{tabs}"
                 format_center "{datetime}"
-                format_right  "#[fg=#1e1e2e,bg=#f5c2e7,bold]  {session}  "
+                format_right  "{mode}"
+
+                // Right side shows the current mode as a pill. Colors mirror the
+                // cheatsheet's per-section badge (dark text #11111b on the section
+                // color). tmux is labeled "Create" since it's the create menu.
+                mode_normal      "#[fg=#11111b,bg=#89b4fa,bold]  Normal  "
+                mode_locked      "#[fg=#11111b,bg=#f38ba8,bold]  Locked  "
+                mode_pane        "#[fg=#11111b,bg=#fab387,bold]  Pane  "
+                mode_tab         "#[fg=#11111b,bg=#cba6f7,bold]  Tab  "
+                mode_resize      "#[fg=#11111b,bg=#94e2d5,bold]  Resize  "
+                mode_move        "#[fg=#11111b,bg=#f9e2af,bold]  Move  "
+                mode_scroll      "#[fg=#11111b,bg=#a6adc8,bold]  Scroll  "
+                mode_search      "#[fg=#11111b,bg=#a6adc8,bold]  Search  "
+                mode_entersearch "#[fg=#11111b,bg=#a6adc8,bold]  Search  "
+                mode_session     "#[fg=#11111b,bg=#f5c2e7,bold]  Session  "
+                mode_tmux        "#[fg=#11111b,bg=#a6e3a1,bold]  Create  "
+                mode_renametab   "#[fg=#11111b,bg=#cba6f7,bold]  Rename Tab  "
+                mode_renamepane  "#[fg=#11111b,bg=#fab387,bold]  Rename Pane  "
 
                 // Tabs — subtle block for inactive, bright block for active, with
-                // trailing spaces as separators so they don't look cut.
-                tab_normal   "#[fg=#7f849c,bg=#313244] {index} {name} #[bg=#181825] "
-                tab_active   "#[fg=#1e1e2e,bg=#89b4fa,bold] {index} {name} #[bg=#181825] "
+                // trailing spaces as separators so they don't look cut. The active
+                // tab turns teal while it holds a fullscreen (zoomed) pane — the
+                // only fullscreen cue now that the bottom bar is gone.
+                tab_normal            "#[fg=#7f849c,bg=#313244] {index} {name} #[bg=#181825] "
+                tab_active            "#[fg=#1e1e2e,bg=#89b4fa,bold] {index} {name} #[bg=#181825] "
+                tab_active_fullscreen "#[fg=#11111b,bg=#89dceb,bold] {index} {name} zoom #[bg=#181825] "
 
                 // Clock (center).
                 datetime          "#[fg=#a6adc8,bg=#181825,bold] {format} "
@@ -32,81 +52,19 @@ layout {
         }
     }
 
-    // ── BOTTOM bar: mode badge + shortcut hints (per-mode via {mode}) ────────
-    pane_template name="bottom_bar" borderless=true {
-        plugin location="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm" {
-                // Real-space fill + #[bg=default] resets — this is the mechanic
-                // that actually renders (a color-only format_space with empty
-                // center/right left the line blank). Hints sit on the terminal
-                // background; the colored badge marks the mode.
-                format_space  " "
-                // The whole per-mode cheatsheet lives in {mode} (left-aligned).
-                // For NORMAL that's the ALT group + a gap + the CTRL group, so the
-                // CTRL group vanishes in every other mode. (format_right isn't
-                // mode-aware — it renders the same widgets in every mode — so the
-                // CTRL group can't live there; it rides on the left next to ALT.)
-                format_left   "{mode}"
-
-                // FULLSCREEN indicator, flush right. zjstatus only exposes the
-                // fullscreen (zoomed-pane) state through the tabs widget, so we
-                // render a deliberately-empty {tabs} here: every tab is blank
-                // EXCEPT the active one WHEN it holds a fullscreen pane, which
-                // shows this badge. Independent of the top bar's tabs (separate
-                // plugin instance).
-                format_right          "{tabs}"
-                tab_separator         ""
-                tab_normal            ""
-                tab_active            ""
-                tab_normal_fullscreen ""
-                tab_active_fullscreen "#[fg=#11111b,bg=#89dceb,bold]  FULLSCREEN  #[bg=default]"
-
-                // Base working mode. ALT group + gap + CTRL group, all in this
-                // string so both vanish outside NORMAL. No separators: each item
-                // is its own tile with an alternating background — two shades of
-                // blue for ALT, two shades of mauve for CTRL — so the two groups
-                // stay visually distinct. Keys carry no A-/C- prefix (badges say so).
-                mode_normal "#[fg=#11111b,bg=#b4befe,bold] NORMAL #[bg=default] #[fg=#11111b,bg=#89b4fa,bold] ALT #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] focus #[fg=#a6e3a1,bg=#3a4d73,bold] 1-9#[fg=#cdd6f4,bg=#3a4d73] tab #[fg=#a6e3a1,bg=#2b3a55,bold] n#[fg=#cdd6f4,bg=#2b3a55] create #[fg=#a6e3a1,bg=#3a4d73,bold] d#[fg=#cdd6f4,bg=#3a4d73] detach #[fg=#a6e3a1,bg=#2b3a55,bold] q#[fg=#cdd6f4,bg=#2b3a55] quit #[fg=#a6e3a1,bg=#3a4d73,bold] r#[fg=#cdd6f4,bg=#3a4d73] relayout #[bg=default]   #[fg=#11111b,bg=#cba6f7,bold] CTRL #[fg=#a6e3a1,bg=#3b2f52,bold] h#[fg=#cdd6f4,bg=#3b2f52] move #[fg=#a6e3a1,bg=#4f3f6e,bold] p#[fg=#cdd6f4,bg=#4f3f6e] panes #[fg=#a6e3a1,bg=#3b2f52,bold] t#[fg=#cdd6f4,bg=#3b2f52] tabs #[fg=#a6e3a1,bg=#4f3f6e,bold] g#[fg=#cdd6f4,bg=#4f3f6e] lock #[bg=default]"
-
-                // "tmux" slot is repurposed as a CREATE menu (entered via A-n).
-                mode_tmux "#[fg=#1e1e2e,bg=#a6e3a1,bold] CREATE #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] split #[fg=#a6e3a1,bg=#3a4d73,bold] s#[fg=#cdd6f4,bg=#3a4d73] stack #[fg=#a6e3a1,bg=#2b3a55,bold] t#[fg=#cdd6f4,bg=#2b3a55] tab #[bg=default]"
-
-                // Pane / Tab modes — only the rename action.
-                mode_pane "#[fg=#1e1e2e,bg=#fab387,bold] PANE #[fg=#a6e3a1,bg=#2b3a55,bold] r#[fg=#cdd6f4,bg=#2b3a55] rename #[bg=default]"
-                mode_tab  "#[fg=#1e1e2e,bg=#cba6f7,bold] TAB #[fg=#a6e3a1,bg=#2b3a55,bold] r#[fg=#cdd6f4,bg=#2b3a55] rename #[bg=default]"
-
-                // Move mode — hjkl move the pane, , . move the tab, d breaks the
-                // pane out into its own new tab.
-                mode_move "#[fg=#1e1e2e,bg=#f9e2af,bold] MOVE #[fg=#a6e3a1,bg=#2b3a55,bold] hjkl#[fg=#cdd6f4,bg=#2b3a55] move pane #[fg=#a6e3a1,bg=#3a4d73,bold] , .#[fg=#cdd6f4,bg=#3a4d73] move tab #[fg=#a6e3a1,bg=#2b3a55,bold] d#[fg=#cdd6f4,bg=#2b3a55] pane -> new tab #[bg=default]"
-
-                // Locked shows just how to get out (otherwise you're stuck).
-                mode_locked "#[fg=#1e1e2e,bg=#f38ba8,bold] LOCKED #[fg=#a6e3a1,bg=#2b3a55,bold] C-g#[fg=#cdd6f4,bg=#2b3a55] unlock #[bg=default]"
-
-                // Everything else: badge only, no hint clutter.
-                mode_resize       "#[fg=#1e1e2e,bg=#94e2d5,bold] RESIZE #[bg=default]"
-                mode_scroll       "#[fg=#1e1e2e,bg=#a6adc8,bold] SCROLL #[fg=#a6e3a1,bg=#2b3a55,bold] j/k#[fg=#cdd6f4,bg=#2b3a55] scroll #[fg=#a6e3a1,bg=#3a4d73,bold] e#[fg=#cdd6f4,bg=#3a4d73] select text (editor) #[fg=#a6e3a1,bg=#2b3a55,bold] s#[fg=#cdd6f4,bg=#2b3a55] search #[bg=default]"
-                mode_search       "#[fg=#1e1e2e,bg=#a6adc8,bold] SEARCH #[bg=default]"
-                mode_enter_search "#[fg=#1e1e2e,bg=#a6adc8,bold] SEARCH #[bg=default]"
-                mode_session      "#[fg=#1e1e2e,bg=#f5c2e7,bold] SESSION #[bg=default]"
-                mode_rename_tab   "#[fg=#1e1e2e,bg=#cba6f7,bold] RENAME #[fg=#a6e3a1,bg=#2b3a55,bold] enter#[fg=#cdd6f4,bg=#2b3a55] confirm #[fg=#a6e3a1,bg=#3a4d73,bold] esc#[fg=#cdd6f4,bg=#3a4d73] cancel #[bg=default]"
-                mode_rename_pane  "#[fg=#1e1e2e,bg=#fab387,bold] RENAME #[fg=#a6e3a1,bg=#2b3a55,bold] enter#[fg=#cdd6f4,bg=#2b3a55] confirm #[fg=#a6e3a1,bg=#3a4d73,bold] esc#[fg=#cdd6f4,bg=#3a4d73] cancel #[bg=default]"
-                mode_prompt       "#[fg=#1e1e2e,bg=#a6adc8,bold] PROMPT #[bg=default]"
-        }
-    }
-
-    // Base tab: top bar, panes, bottom bar. New tabs use this.
+    // Base tab: top bar + panes. New tabs use this. There is no bottom bar —
+    // keybinding hints live in the `Ctrl Alt h` floating cheatsheet (see the header).
     // (size=1 lives at the use site — pane_template definitions reject `size`.)
     default_tab_template {
         top_bar size=1
         children
-        bottom_bar size=1
     }
 
     // Same structure as a named template so the swap layouts below can wrap the
-    // bars around whichever arrangement they snap the panes into.
+    // top bar around whichever arrangement they snap the panes into.
     tab_template name="ui" {
         top_bar size=1
         children
-        bottom_bar size=1
     }
 
     // ── Swap layouts ────────────────────────────────────────────────────────

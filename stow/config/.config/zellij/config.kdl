@@ -144,6 +144,17 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
+        bind "Ctrl Alt h" {
+            Run "bash" "-c" "exec python3 $HOME/.config/zellij/keybind-cheatsheet.py" {
+                floating true
+                name "keybindings"
+                close_on_exit true
+                width "90%"
+                height "90%"
+                x "5%"
+                y "5%"
+            }
+        }
         bind "Alt c" { Clear; }
         bind "Alt e" { EditScrollback; SwitchToMode "normal"; }
         bind "Alt f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
