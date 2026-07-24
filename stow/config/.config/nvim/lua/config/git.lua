@@ -15,6 +15,7 @@ map('n', '<leader>gB', function() require('gitsigns').toggle_current_line_blame(
   { desc = 'Toggle inline blame' })
 map('n', '<leader>gv', '<cmd>Git blame<cr>', { desc = 'Blame column (side-by-side)' })
 
+map('n', '<leader>gf', '<cmd>Git log --follow -- %<cr>', { desc = 'File history' })
 map('n', '<leader>gl', function()
   local l = vim.fn.line('.')
   vim.cmd(string.format('Git log -L %d,%d:%%', l, l))

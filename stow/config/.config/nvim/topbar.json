@@ -37,6 +37,7 @@
     ["<leader>dv", "toggle inline"],
 
     ["<leader>gb", "blame line"],
+    ["<leader>gf", "file history"],
     ["<leader>gl", "line history"],
     ["<leader>gc", "line change"],
     ["<leader>gr", "restore line"],
