@@ -221,6 +221,38 @@ require('lazy').setup({
           ['<C-b>']     = cmp.mapping.scroll_docs(-4),
         }),
         sources = { { name = 'nvim_lsp' }, { name = 'luasnip' } },
+        sorting = {
+          comparators = {
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.locality,
+            cmp.config.compare.kind,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
+        },
+        formatting = {
+          fields = { 'abbr', 'kind', 'menu' },
+          format = function(entry, item)
+            local ci = entry.completion_item
+            local ld = ci.labelDetails
+            local ctx
+            if ld and ld.detail and ld.detail:match('^%s*%(as ') then
+              ctx = ld.detail
+            else
+              ctx = (ld and ld.description) or ci.detail
+            end
+            if ctx and ctx ~= '' then
+              ctx = ctx:gsub('%s+', ' ')
+              if #ctx > 40 then ctx = ctx:sub(1, 39) .. '…' end
+              item.menu = ctx
+            end
+            return item
+          end,
+        },
       })
     end,
   },
