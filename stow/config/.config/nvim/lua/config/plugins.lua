@@ -201,6 +201,21 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'ray-x/lsp_signature.nvim',
+    event = 'LspAttach',
+    opts = {
+      hint_enable = false,
+      floating_window = true,
+      floating_window_above_cur_line = true,
+      -- Only pop on the `(`/`,` trigger chars. The default idle-refresh (CursorHold)
+      -- re-requests signature help while you rest on a line, which surfaces stale /
+      -- enclosing-call hints on blank lines.
+      cursorhold_update = false,
+      toggle_key = '<C-s>',   -- also summon/dismiss on demand in insert mode
+    },
+  },
+
   -- Copilot ghost text. Accept is <C-l>, NOT <Tab> (that's nvim-cmp's select-next
   -- above), so the two completion systems don't fight.
   {
