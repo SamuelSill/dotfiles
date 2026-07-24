@@ -142,8 +142,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
       })
     end, 'Add import for symbol')
 
-    map('<A-f>', function() vim.lsp.buf.format({ async = true }) end, 'Format document')
-    vim.keymap.set('x', '<A-f>', function()
+    map('<C-A-f>', function() vim.lsp.buf.format({ async = true }) end, 'Format document')
+    vim.keymap.set('x', '<C-A-f>', function()
       local can_range = #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/rangeFormatting' }) > 0
       if can_range then
         vim.lsp.buf.format({ async = true })
