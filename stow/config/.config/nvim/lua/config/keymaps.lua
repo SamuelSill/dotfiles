@@ -248,6 +248,22 @@ end
 
 map({ 'n', 'x' }, '<M-a>', ai.ask, { desc = 'Ask claude about line / selection' })
 
+-- Preview the current markdown file with mdview (a zsh function, hence `zsh -ic`).
+map('n', '<leader>v', function()
+  local file = vim.fn.expand('%:p')
+  if file == '' then
+    vim.notify('mdview: no file to preview', vim.log.levels.WARN)
+    return
+  end
+  vim.cmd('write')
+  vim.system({ 'zsh', '-ic', 'mdview "$1"', 'mdview', file }, { text = true }, function(res)
+    vim.schedule(function()
+      local out = (res.stdout ~= '' and res.stdout or res.stderr):gsub('%s+$', '')
+      vim.notify(out ~= '' and out or 'mdview: done', res.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR)
+    end)
+  end)
+end, { desc = 'Preview current markdown in browser (mdview)' })
+
 map('n', '<leader>?', fzf.keymaps, { desc = 'Show all keybindings' })
 
 map('n', '<leader>dv', function()
