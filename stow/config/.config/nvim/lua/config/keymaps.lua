@@ -11,20 +11,43 @@ map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (re
 map('n', '<M-d>', lsp.smart_goto_definition, { desc = 'Goto definition / file under cursor' })
 map('n', '<M-r>', lsp.smart_references, { desc = 'Goto references' })
 
+-- v:oldfiles is a snapshot read from the shada file at startup: it never grows
+-- during the session, so files visited since launch are missing from it and its
+-- order is stale. Keep our own most-recent-first list of real file buffers, and
+-- treat it as newer than everything in v:oldfiles.
+local session_recent = {}
+vim.api.nvim_create_autocmd('BufEnter', {
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= '' then return end
+    local file = vim.api.nvim_buf_get_name(args.buf)
+    if file == '' then return end
+    for i, f in ipairs(session_recent) do
+      if f == file then
+        table.remove(session_recent, i)
+        break
+      end
+    end
+    table.insert(session_recent, 1, file)
+  end,
+})
+
 -- Find-files with recently-visited files floated to the top: prepend this cwd's
--- :oldfiles entries to fd's stream, dedupe (recents win), and break fzf score
--- ties by input order (--tiebreak=index) so a recent match outranks an equally
--- good non-recent one. fd still streams, so it stays fast on huge trees.
+-- recents to fd's stream, dedupe (recents win), and break fzf score ties by
+-- input order (--tiebreak=index) so a recent match outranks an equally good
+-- non-recent one. fd still streams, so it stays fast on huge trees.
 local function find_files_recent_first()
   local cwd = vim.uv.cwd()
   local prefix = cwd .. '/'
-  local seen, recent = {}, {}
-  for _, f in ipairs(vim.v.oldfiles) do
-    if f:sub(1, #prefix) == prefix and vim.uv.fs_stat(f) then
-      local rel = f:sub(#prefix + 1)
-      if rel ~= '' and not seen[rel] then
-        seen[rel] = true
-        recent[#recent + 1] = vim.fn.shellescape(rel)
+  local current = vim.api.nvim_buf_get_name(0)          -- already open: don't rank it first
+  local seen, recent = { [current] = true }, {}
+  for _, list in ipairs({ session_recent, vim.v.oldfiles }) do
+    for _, f in ipairs(list) do
+      if not seen[f] and f:sub(1, #prefix) == prefix and vim.uv.fs_stat(f) then
+        seen[f] = true
+        local rel = f:sub(#prefix + 1)
+        if rel ~= '' then
+          recent[#recent + 1] = vim.fn.shellescape(rel)
+        end
       end
     end
   end
