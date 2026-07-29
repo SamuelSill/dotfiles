@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import datetime
+import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 DOTFILES_DIR = Path(__file__).resolve().parent
@@ -476,11 +480,212 @@ Next steps:
 """
 
 
+_MEDIA_KEYS = "org.gnome.settings-daemon.plugins.media-keys"
+_KEYBIND_BASE = f"/{_MEDIA_KEYS.replace('.', '/')}/custom-keybindings"
+
+_FAVORITE_APPS = ["kitty.desktop", "slack.desktop", "google-chrome.desktop"]
+
+_EXTENSIONS_SITE = "https://extensions.gnome.org"
+_FOCUS_CHANGER_UUID = "focus-changer@heartmire"
+_DIRECTIONAL_FOCUS_BINDINGS = {"focus-left": "h", "focus-down": "j",
+                               "focus-up": "k", "focus-right": "l"}
+
+# Super+h minimizes and Super+l locks the screen by default; a shell extension's
+# binding loses to both, so the focus keys only fire once these move off those keys.
+# Minimize shifts onto Super+Shift+h; lock can't just move here (see
+# setup_lock_screen_shortcut) so it is cleared and re-added as a custom shortcut.
+_DIRECTIONAL_FOCUS_REBINDS = [
+    ("org.gnome.desktop.wm.keybindings", "minimize", ["<Super><Shift>h"]),
+    ("org.gnome.settings-daemon.plugins.media-keys", "screensaver", []),
+]
+
+_LOCK_SCREEN_BINDING = "<Super><Shift>l"
+_LOCK_SCREEN_COMMAND = ("gdbus call -e -d org.gnome.ScreenSaver "
+                        "-o /org/gnome/ScreenSaver -m org.gnome.ScreenSaver.Lock")
+
+
+def setup_per_window_input_source():
+    """Make the keyboard layout a per-window property instead of a global one.
+
+    GNOME implements this but exposes no UI for it; the shell watches the key, so
+    the change takes effect without a re-login.
+    """
+    if not have("gsettings"):
+        return  # not a GNOME desktop
+
+    run(["gsettings", "set", "org.gnome.desktop.input-sources", "per-window", "true"])
+    ok("keyboard layout is now remembered per window")
+
+
+def setup_app_favorites(extra_favorites=()):
+    """Pin the dash favorites that GNOME's Super+1..9 shortcuts activate, in order.
+
+    switch-to-application-N focuses favorite N's window when the app is running and
+    launches it otherwise. GNOME drops a favorite whose desktop entry is missing or
+    hidden, which silently shifts every number after it — so unusable entries are
+    filtered out loudly rather than left to renumber the rest. We also assert the
+    bindings themselves, since switch-to-workspace-N on the same keys wins the
+    conflict and leaves the shortcut dead.
+    """
+    if not have("gsettings"):
+        return  # not a GNOME desktop
+
+    wanted = [*_FAVORITE_APPS, *extra_favorites]
+    favorites = [app for app in wanted if _is_listed_desktop_entry(app)]
+    for app in wanted:
+        if app not in favorites:
+            warn(f"{app} is not installed or is hidden; skipping it "
+                 "(the remaining Super+N numbers shift up by one)")
+    run(["gsettings", "set", "org.gnome.shell", "favorite-apps",
+         "[" + ", ".join(f"'{app}'" for app in favorites) + "]"])
+    for i, app in enumerate(favorites[:9], start=1):
+        run(["gsettings", "set", "org.gnome.shell.keybindings",
+             f"switch-to-application-{i}", f"['<Super>{i}']"])
+        run(["gsettings", "set", "org.gnome.desktop.wm.keybindings",
+             f"switch-to-workspace-{i}", "[]"])
+        ok(f"Super+{i} -> {app}")
+
+
+def setup_directional_window_focus():
+    """Bind Super+h/j/k/l to move focus to the window in that direction.
+
+    Mutter has no directional-focus concept and Wayland forbids anything outside the
+    compositor from moving focus, so this needs a shell extension (focus-changer).
+    """
+    if not have("gsettings") or not have("gnome-extensions"):
+        return  # not a GNOME desktop
+
+    extension = Path.home() / ".local/share/gnome-shell/extensions" / _FOCUS_CHANGER_UUID
+    if not extension.is_dir() and not _install_shell_extension(_FOCUS_CHANGER_UUID):
+        return
+
+    _enable_shell_extension(_FOCUS_CHANGER_UUID)
+    for schema, key, bindings in _DIRECTIONAL_FOCUS_REBINDS:
+        run(["gsettings", "set", schema, key,
+             "[" + ", ".join(f"'{binding}'" for binding in bindings) + "]"])
+
+    # The extension's schema isn't in the system schema path, so gsettings needs
+    # pointing at the copy it ships.
+    env = {**os.environ, "GSETTINGS_SCHEMA_DIR": str(extension / "schemas")}
+    for key, letter in _DIRECTIONAL_FOCUS_BINDINGS.items():
+        run(["gsettings", "set", "org.gnome.shell.extensions.focus-changer",
+             key, f"['<Super>{letter}']"], env=env)
+    ok("Super+h/j/k/l focus the window left/down/up/right")
+
+
+def setup_lock_screen_shortcut():
+    """Re-home the lock screen on Super+Shift+l, since directional focus takes Super+l.
+
+    A custom shortcut rather than just moving the built-in `screensaver` binding:
+    gsd-media-keys doesn't re-grab that accelerator when the setting changes, so
+    moving it leaves the machine with no working lock key until the next login.
+    """
+    if not have("gsettings"):
+        return  # not a GNOME desktop
+
+    _register_gnome_keybind("lock-screen", "Lock screen",
+                            _LOCK_SCREEN_COMMAND, _LOCK_SCREEN_BINDING)
+
+
+def _install_shell_extension(uuid):
+    """Fetch <uuid> from extensions.gnome.org for the running shell and install it."""
+    shell_version = _out(["gnome-shell", "--version"]).split()[-1].split(".")[0]
+    query = urllib.parse.urlencode({"uuid": uuid, "shell_version": shell_version})
+    try:
+        with urllib.request.urlopen(f"{_EXTENSIONS_SITE}/extension-info/?{query}",
+                                    timeout=30) as response:
+            download_path = json.load(response)["download_url"]
+        with urllib.request.urlopen(_EXTENSIONS_SITE + download_path, timeout=60) as response:
+            archive_bytes = response.read()
+    except Exception as error:
+        warn(f"could not fetch {uuid} for GNOME Shell {shell_version}: {error}")
+
+        return False
+
+    tmp = tempfile.mkdtemp()
+    archive = Path(tmp, "extension.zip")
+    archive.write_bytes(archive_bytes)
+    installed = run(["gnome-extensions", "install", "--force", str(archive)]).returncode == 0
+    shutil.rmtree(tmp, ignore_errors=True)
+    if installed:
+        ok(f"installed {uuid}")
+    else:
+        warn(f"could not install {uuid}")
+
+    return installed
+
+
+def _enable_shell_extension(uuid):
+    """Enable <uuid> by writing enabled-extensions directly.
+
+    `gnome-extensions enable` asks the running shell, which only scans the extension
+    directory at startup and so rejects a just-installed uuid; the gsettings key is
+    read at next login regardless.
+    """
+    enabled = re.findall(r"'([^']*)'", _out(["gsettings", "get", "org.gnome.shell",
+                                            "enabled-extensions"]))
+    if uuid in enabled:
+        ok(f"{uuid} already enabled")
+        return
+
+    enabled.append(uuid)
+    run(["gsettings", "set", "org.gnome.shell", "enabled-extensions",
+         "[" + ", ".join(f"'{e}'" for e in enabled) + "]"])
+    ok(f"enabled {uuid} (active after the next login)")
+
+
+def _desktop_entry_dirs():
+    data_home = os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))
+    data_dirs = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share")
+
+    return [Path(d, "applications") for d in [data_home, *data_dirs.split(":")]]
+
+
+def _is_listed_desktop_entry(desktop_id):
+    """True if <desktop_id> exists and GNOME will list it as an app (some packages
+    ship a NoDisplay duplicate of their entry, which can never be a favorite)."""
+    for directory in _desktop_entry_dirs():
+        entry = directory / desktop_id
+        if not entry.is_file():
+            continue
+        main_group = entry.read_text(errors="replace").split("[Desktop Entry]", 1)[-1] \
+                                                      .split("\n[", 1)[0]
+
+        return not re.search(r"^(NoDisplay|Hidden)\s*=\s*true", main_group,
+                             re.MULTILINE | re.IGNORECASE)
+
+    return False
+
+
+def _register_gnome_keybind(key, name, command, binding):
+    """Idempotently add one GNOME media-keys custom shortcut, preserving any others."""
+    path = f"{_KEYBIND_BASE}/{key}/"
+    paths = re.findall(r"'([^']*)'", _out(["gsettings", "get", _MEDIA_KEYS,
+                                           "custom-keybindings"]))
+    if path not in paths:
+        paths.append(path)
+        run(["gsettings", "set", _MEDIA_KEYS, "custom-keybindings",
+             "[" + ", ".join(f"'{p}'" for p in paths) + "]"])
+    schema = f"{_MEDIA_KEYS}.custom-keybinding:{path}"
+    run(["gsettings", "set", schema, "name", name])
+    run(["gsettings", "set", schema, "command", command])
+    run(["gsettings", "set", schema, "binding", binding])
+    ok(f"GNOME shortcut '{name}' bound to {binding}")
+
+
 def main():
     install_deps()
     step("Deploying config via stow")
     deploy_pkg(DOTFILES_DIR, "config")
     deploy_pkg(DOTFILES_DIR, "claude")
+    step("Setting up per-window keyboard layout")
+    setup_per_window_input_source()
+    step("Pinning the Super+1..9 app favorites")
+    setup_app_favorites()
+    step("Setting up Super+h/j/k/l directional window focus")
+    setup_directional_window_focus()
+    step("Re-homing the lock screen on Super+Shift+L")
+    setup_lock_screen_shortcut()
     if os.environ.get("DOTFILES_SKIP_SHELL"):
         warn("DOTFILES_SKIP_SHELL set; leaving ~/.zshrc hook to the wrapper installer")
     else:
