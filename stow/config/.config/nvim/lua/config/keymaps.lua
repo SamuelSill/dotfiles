@@ -36,6 +36,16 @@ local function find_files_recent_first()
 end
 map('n', '<C-p>',      find_files_recent_first,  { desc = 'Find files (recent first)' })
 map('n', '<leader>ff', find_files_recent_first,  { desc = 'Find files (recent first)' })
+-- Like <C-p> but rooted outside the project so wider trees are reachable.
+local function find_files_under(root)
+  return function()
+    local fd = vim.fn.executable('fd') == 1 and 'fd' or 'fdfind'
+    local cmd = fd .. ' --type f --color=never --hidden --exclude .git'
+    fzf.files({ cwd = root, cmd = cmd, fzf_opts = { ['--multi'] = false } })
+  end
+end
+map('n', '<leader>fa', find_files_under('/'),           { desc = 'Find files anywhere on the system' })
+map('n', '<leader>fu', find_files_under(vim.env.HOME),  { desc = 'Find files in home directory' })
 -- Grep supports a trailing ` -- <glob>` file filter, e.g.  TODO -- *.{h,cc} !*test*
 map('n', '<leader>fg', fzf.live_grep,            { desc = 'Grep in project (+ file glob)' })
 map('x', '<leader>fg', fzf.grep_visual,          { desc = 'Grep selection in project' })

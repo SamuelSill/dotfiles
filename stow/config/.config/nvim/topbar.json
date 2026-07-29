@@ -25,6 +25,8 @@
 
   "bindings": [
     ["<leader>fg", "grep (+glob)"],
+    ["<leader>fa", "files (anywhere)"],
+    ["<leader>fu", "files (home)"],
     ["<leader>fr", "find/replace"],
     ["<leader>fb", "open files"],
     ["<leader>fs", "symbol (project)"],
