@@ -146,6 +146,7 @@ map('n', '<leader>yL', function()
 end, { desc = 'Copy full (absolute) path with line number' })
 map('x', 'p', 'P', { desc = 'Paste over selection without yanking it' })
 map('n', '<leader>w',  '<cmd>write<cr>',         { desc = 'Save file' })
+map('n', '<leader>W',  '<cmd>wall<cr>',          { desc = 'Save all files' })
 map('n', '<leader>q',  '<cmd>quit<cr>',          { desc = 'Quit window' })
 map('n', '<Esc>',      '<cmd>nohlsearch<cr>',    { desc = 'Clear search highlight' })
 
