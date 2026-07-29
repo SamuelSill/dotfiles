@@ -92,13 +92,17 @@ do
       pcall(function() vim.treesitter.get_parser():parse() end)
       node = node_at_cursor()
     end
+    local cur_r, cur_c = unpack(vim.api.nvim_win_get_cursor(0))
+    cur_r = cur_r - 1
     while node do
       if BLOCK[node:type()] then
         local r, c = (name_node(node) or node):start()
-        vim.cmd("normal! m'")                                -- record jump for <C-o>
-        vim.api.nvim_win_set_cursor(0, { r + 1, c })
-        vim.cmd('normal! zz')
-        return
+        if r < cur_r or (r == cur_r and c < cur_c) then       -- only jump backwards; else seek outer block
+          vim.cmd("normal! m'")                                -- record jump for <C-o>
+          vim.api.nvim_win_set_cursor(0, { r + 1, c })
+          vim.cmd('normal! zz')
+          return
+        end
       end
       node = node:parent()
     end
