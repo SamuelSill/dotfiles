@@ -30,19 +30,19 @@ def create_alias_command(name, command, shell_type):
     """Create an alias/function command for the specified shell type."""
     import re
     if shell_type == 'sh':
-        cmd_escaped = command.replace("'", "'\\''")
-
         # Check if command starts with its own name (e.g., claude -> claude --settings)
         # Use alias in this case since aliases have built-in recursion protection
         cmd_first_word = re.split(r'\s', command.strip())[0]
         if cmd_first_word == name:
+            # The alias body is single-quoted, unlike the function body below.
+            cmd_escaped = command.replace("'", "'\\''")
             return f"alias {name}='{cmd_escaped}'"
 
         # Use functions for better syntax highlighting
         # If command doesn't already handle args ($@, $1, etc), append "$@"
         if not re.search(r'\$[@\d]', command):
-            cmd_escaped = f'{cmd_escaped} "$@"'
-        return f"{name}() {{ {cmd_escaped}; }}"
+            command = f'{command} "$@"'
+        return f"{name}() {{ {command}; }}"
     else:
         raise ValueError(f"Unknown shell type: {shell_type}")
 
