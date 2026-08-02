@@ -112,7 +112,7 @@
     "command": "python3 \"$DOTFILES_DIR/git-utils/reset_to_origin.py\""
   },
   {
-    "name": "claude",
+    "name": ["claude", "c"],
     "command": "python3 \"$DOTFILES_DIR/claude/run_claude.py\" $@"
   },
   {
