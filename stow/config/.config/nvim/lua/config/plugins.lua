@@ -159,13 +159,15 @@ require('lazy').setup({
       require('nvim-treesitter').install({
         'c', 'cpp', 'c_sharp', 'lua', 'python', 'rust', 'bash', 'json',
         'markdown', 'markdown_inline',
+        'html', 'css', 'scss', 'javascript', 'typescript', 'tsx',
       })
 
       -- `main` doesn't auto-enable highlighting; turn it on per-filetype, skipping
       -- huge generated files.
       vim.api.nvim_create_autocmd('FileType', {
         pattern = { 'c', 'cpp', 'cs', 'lua', 'python', 'rust', 'sh', 'bash', 'json',
-                    'markdown' },
+                    'markdown', 'html', 'css', 'scss', 'javascript', 'javascriptreact',
+                    'typescript', 'typescriptreact' },
         callback = function(ev)
           local name = vim.api.nvim_buf_get_name(ev.buf)
           local ok, stats = pcall((vim.uv or vim.loop).fs_stat, name)
@@ -198,7 +200,12 @@ require('lazy').setup({
   {
     'williamboman/mason-lspconfig.nvim',
     dependencies = { 'williamboman/mason.nvim', 'neovim/nvim-lspconfig' },
-    opts = { ensure_installed = { 'pyright', 'rust_analyzer', 'omnisharp' } },
+    opts = {
+      ensure_installed = {
+        'pyright', 'rust_analyzer', 'omnisharp',
+        'ts_ls', 'html', 'cssls', 'jsonls', 'eslint', 'emmet_language_server',
+      },
+    },
   },
 
   {

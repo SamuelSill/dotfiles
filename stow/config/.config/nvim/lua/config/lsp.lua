@@ -26,7 +26,51 @@ vim.lsp.config('rust_analyzer', {
   },
 })
 
-vim.lsp.enable({ 'clangd', 'pyright', 'rust_analyzer', 'omnisharp' })
+-- Web servers. ts_ls covers JS/TS/JSX/TSX, html/cssls/jsonls are the vscode-*
+-- language servers, eslint adds project lint diagnostics + fix-all code actions,
+-- and emmet expands abbreviations (div.foo>p) as completion items.
+
+-- ts_ls advertises inlay hints but emits none until each kind is asked for.
+local typescript_inlay_hints = {
+  includeInlayParameterNameHints = 'literals',
+  includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+  includeInlayFunctionParameterTypeHints = true,
+  includeInlayVariableTypeHints = false,
+  includeInlayPropertyDeclarationTypeHints = true,
+  includeInlayFunctionLikeReturnTypeHints = true,
+  includeInlayEnumMemberValueHints = true,
+}
+
+vim.lsp.config('ts_ls', {
+  settings = {
+    typescript = { inlayHints = typescript_inlay_hints },
+    javascript = { inlayHints = typescript_inlay_hints },
+  },
+})
+
+-- Plain CSS validation flags Tailwind/SCSS-style at-rules (@apply, @tailwind) as
+-- unknown, so silence just that check; everything else stays on.
+vim.lsp.config('cssls', {
+  settings = {
+    css = { lint = { unknownAtRules = 'ignore' } },
+    scss = { lint = { unknownAtRules = 'ignore' } },
+    less = { lint = { unknownAtRules = 'ignore' } },
+  },
+})
+
+-- Emmet is completion-only, and its root-dir detection expects a web project;
+-- attach it by filetype from any directory instead.
+vim.lsp.config('emmet_language_server', {
+  filetypes = { 'html', 'css', 'scss', 'less', 'javascriptreact', 'typescriptreact', 'vue', 'svelte' },
+  root_dir = function(bufnr, on_dir)
+    on_dir(vim.fs.root(bufnr, { '.git', 'package.json' }) or vim.fn.getcwd())
+  end,
+})
+
+vim.lsp.enable({
+  'clangd', 'pyright', 'rust_analyzer', 'omnisharp',
+  'ts_ls', 'html', 'cssls', 'jsonls', 'eslint', 'emmet_language_server',
+})
 
 -- Re-apply on ColorScheme so the symbol-under-cursor highlight survives a theme switch.
 local function set_reference_hl()
