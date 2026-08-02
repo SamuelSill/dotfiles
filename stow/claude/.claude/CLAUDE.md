@@ -4,6 +4,15 @@
 
 When writing any software in any language, follow the instructions below strictly:
 
+### Clean Code
+
+Always strive to prioritize clean, readable and straightforward code - even at the cost of performance in cases where it isn't important.
+
+This comes into practice in multiple ways:
+
+* Keep functions short - if a block of code gets too long, turn it into a separate function. A reader should understand any function's implementation after a brief read.
+* Keep indentation at a minimum - utilize early returns, and utility functions for keeping the code parsable, without too much mental strain.
+
 ### Formatting / Style
 
 In general, always follow the surrounding code's style strictly, even if it contradicts my own preferences.
