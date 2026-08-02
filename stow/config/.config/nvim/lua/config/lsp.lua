@@ -172,6 +172,28 @@ end
 M.smart_goto_definition = smart_goto_definition
 _G.SmartGotoDefinition = smart_goto_definition
 
+-- Lines holding the definition of the symbol under the cursor, keyed
+-- "<file>:<lnum>". Used to drop the definition from the reference list:
+-- `includeDeclaration = false` alone isn't enough, as some servers
+-- (rust-analyzer for locals and parameters) report it as a plain reference.
+local function definition_lines(client)
+  local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
+  local responses = vim.lsp.buf_request_sync(0, 'textDocument/definition', params, 500) or {}
+  local lines = {}
+  for _, response in pairs(responses) do
+    local result = response.result or {}
+    for _, location in ipairs(vim.islist(result) and result or { result }) do
+      local uri = location.uri or location.targetUri
+      local range = location.range or location.targetSelectionRange
+      if uri and range then
+        lines[vim.uri_to_fname(uri) .. ':' .. (range.start.line + 1)] = true
+      end
+    end
+  end
+
+  return lines
+end
+
 -- gr mirroring gd: LSP references when a capable server is attached, else a
 -- project-wide grep for the word under the cursor (so gr still works in
 -- languages with no LSP configured here). Both open the same fzf-lua list.
@@ -179,7 +201,15 @@ local function smart_references()
   local fzf = require('fzf-lua')
   for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
     if client.server_capabilities.referencesProvider then
-      fzf.lsp_references({ jump1 = true })
+      local definitions = definition_lines(client)
+      fzf.lsp_references({
+        jump1 = true,
+        includeDeclaration = false,
+        regex_filter = function(item)
+          return not definitions[item.filename .. ':' .. item.lnum]
+        end,
+      })
+
       return
     end
   end
