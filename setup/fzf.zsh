@@ -18,3 +18,11 @@ elif (( $+commands[fzf] )); then
         unset _kb
     fi
 fi
+
+for _widget in fzf-history-widget fzf-file-widget fzf-cd-widget; do
+    (( $+functions[$_widget] )) || continue
+
+    functions[$_widget-keep-buffer]="run_widget_with_prompt_clock_paused $_widget"
+    zle -N $_widget $_widget-keep-buffer
+done
+unset _widget
