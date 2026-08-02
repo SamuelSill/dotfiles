@@ -122,5 +122,9 @@
   {
     "name": "zellij-a",
     "command": "session=$(zellij ls -s | fzf --preview \"\\\"$DOTFILES_DIR/setup/zellij-preview.py\\\" {}\") && [ -n \"$session\" ] && zellij a \"$session\""
+  },
+  {
+    "name": ["zellij-workspace", "zw"],
+    "command": "python3 \"$DOTFILES_DIR/zellij-utils/launch_workspace.py\" $@"
   }
 ]
