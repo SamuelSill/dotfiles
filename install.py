@@ -485,6 +485,9 @@ _KEYBIND_BASE = f"/{_MEDIA_KEYS.replace('.', '/')}/custom-keybindings"
 
 _FAVORITE_APPS = ["kitty.desktop", "slack.desktop", "google-chrome.desktop"]
 
+_APP_SWITCHER_KEYS = ["switch-applications", "switch-applications-backward",
+                      "switch-windows", "switch-windows-backward"]
+
 _EXTENSIONS_SITE = "https://extensions.gnome.org"
 _FOCUS_CHANGER_UUID = "focus-changer@heartmire"
 _DIRECTIONAL_FOCUS_BINDINGS = {"focus-left": "h", "focus-down": "j",
@@ -544,6 +547,20 @@ def setup_app_favorites(extra_favorites=()):
         run(["gsettings", "set", "org.gnome.desktop.wm.keybindings",
              f"switch-to-workspace-{i}", "[]"])
         ok(f"Super+{i} -> {app}")
+
+
+def disable_app_switcher():
+    """Clear Alt/Super+Tab (and the Shift variants) so Super+N is the only way in.
+
+    Cycling through a switcher list is the habit the Super+N favorites replace; leaving
+    it bound means never learning the numbers.
+    """
+    if not have("gsettings"):
+        return  # not a GNOME desktop
+
+    for key in _APP_SWITCHER_KEYS:
+        run(["gsettings", "set", "org.gnome.desktop.wm.keybindings", key, "[]"])
+    ok("Alt/Super+Tab no longer switch apps")
 
 
 def setup_directional_window_focus():
@@ -682,6 +699,8 @@ def main():
     setup_per_window_input_source()
     step("Pinning the Super+1..9 app favorites")
     setup_app_favorites()
+    step("Unbinding the Alt/Super+Tab app switcher")
+    disable_app_switcher()
     step("Setting up Super+h/j/k/l directional window focus")
     setup_directional_window_focus()
     step("Re-homing the lock screen on Super+Shift+L")
