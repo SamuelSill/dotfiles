@@ -6,8 +6,6 @@
 // zjstatus is downloaded + cached from its GitHub release on first run (needs
 // network the first time). Pinned to v0.24.0; bump the URL to update.
 //
-// NOTE: the clock uses datetime_timezone below — change it to your IANA zone if
-// the time looks off (e.g. "Europe/London", "America/New_York").
 
 layout {
     // ── TOP bar: tabs · clock · session ─────────────────────────────────────
@@ -17,7 +15,6 @@ layout {
                 // it MUST be non-empty (with the bar bg) or center/right collapse.
                 format_space  "#[bg=#181825]"
                 format_left   "{tabs}"
-                format_center "{datetime}"
                 format_right  "{mode}"
 
                 // Right side shows the current mode as a pill. Colors mirror the
@@ -44,11 +41,6 @@ layout {
                 tab_normal            "#[fg=#7f849c,bg=#313244] {index} {name} #[bg=#181825] "
                 tab_active            "#[fg=#1e1e2e,bg=#89b4fa,bold] {index} {name} #[bg=#181825] "
                 tab_active_fullscreen "#[fg=#11111b,bg=#89dceb,bold] {index} {name} zoom #[bg=#181825] "
-
-                // Clock (center).
-                datetime          "#[fg=#a6adc8,bg=#181825,bold] {format} "
-                datetime_format   "%a %H:%M"
-                datetime_timezone "Asia/Jerusalem"
         }
     }
 
