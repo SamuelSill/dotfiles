@@ -267,7 +267,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- Call clangd's custom request directly: the :ClangdSwitchSourceHeader user
     -- command isn't auto-registered on newer Neovim/lspconfig.
-    map('gh', function()
+    map('<A-o>', function()
       local client = vim.lsp.get_clients({ bufnr = 0, name = 'clangd' })[1]
       if not client then
         vim.notify('Switch header/source: clangd not attached to this buffer', vim.log.levels.WARN)
