@@ -233,6 +233,65 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
 -- Inline diagnostics on by default; toggle with <leader>dv (config/keymaps.lua).
 vim.diagnostic.config({ virtual_text = true })
 
+local diagnostic_float_namespace = vim.api.nvim_create_namespace('diagnostic_float_severity')
+
+local severity_labels = {
+  [vim.diagnostic.severity.ERROR] = { 'Error', 'DiagnosticFloatingError' },
+  [vim.diagnostic.severity.WARN]  = { 'Warn',  'DiagnosticFloatingWarn' },
+  [vim.diagnostic.severity.INFO]  = { 'Info',  'DiagnosticFloatingInfo' },
+  [vim.diagnostic.severity.HINT]  = { 'Hint',  'DiagnosticFloatingHint' },
+}
+
+-- One float line per line of each message, plus the highlight group each line
+-- should get, so a wrapped multi-line message keeps its severity colour.
+local function diagnostic_float_lines(diagnostics)
+  local lines, highlights = {}, {}
+  for _, diagnostic in ipairs(diagnostics) do
+    local label, highlight = unpack(severity_labels[diagnostic.severity])
+    local source = diagnostic.source and (' [' .. diagnostic.source .. ']') or ''
+    for i, message_line in ipairs(vim.split(diagnostic.message, '\n', { trimempty = true })) do
+      local first = i == 1
+      local prefix = first and (label .. ': ') or string.rep(' ', #label + 2)
+      table.insert(lines, prefix .. message_line .. (first and source or ''))
+      table.insert(highlights, highlight)
+    end
+  end
+
+  return lines, highlights
+end
+
+-- vim.diagnostic.open_float matches diagnostics by their start line, while the
+-- underline is drawn across the whole lnum..end_lnum range -- so a multi-line
+-- diagnostic (common in Rust) leaves squiggles on lines the float says nothing
+-- about. Report every diagnostic whose range covers the cursor line instead.
+local function open_covering_diagnostic_float()
+  local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local covering = vim.tbl_filter(function(diagnostic)
+    return diagnostic.lnum <= lnum and (diagnostic.end_lnum or diagnostic.lnum) >= lnum
+  end, vim.diagnostic.get(0))
+
+  if #covering == 0 then
+    vim.notify('No diagnostic under cursor', vim.log.levels.INFO)
+    return
+  end
+
+  table.sort(covering, function(a, b) return a.severity < b.severity end)
+  local lines, highlights = diagnostic_float_lines(covering)
+  local float_buf = vim.lsp.util.open_floating_preview(lines, '', {
+    border = 'rounded',
+    focus = false,
+    focusable = true,
+    wrap = true,
+  })
+  for i, highlight in ipairs(highlights) do
+    vim.api.nvim_buf_set_extmark(float_buf, diagnostic_float_namespace, i - 1, 0, {
+      end_col = #lines[i],
+      hl_group = highlight,
+    })
+  end
+end
+M.open_covering_diagnostic_float = open_covering_diagnostic_float
+
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local map = function(lhs, rhs, desc)
@@ -286,7 +345,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end, 'Switch header/source')
     map('[d', vim.diagnostic.goto_prev,      'Prev diagnostic')
     map(']d', vim.diagnostic.goto_next,      'Next diagnostic')
-    map('<leader>dd', vim.diagnostic.open_float, 'Show diagnostic under cursor')
+    map('<leader>dd', open_covering_diagnostic_float, 'Show diagnostic under cursor')
     map('<leader>dl', fzf.diagnostics_document, 'List diagnostics (this file)')
 
     map('<leader>hu', function() vim.lsp.buf.typehierarchy('supertypes') end,
