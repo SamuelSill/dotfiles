@@ -22,7 +22,7 @@
         ["h j k l", "focus"],
         ["1-9", "tab"],
         ["n", "create menu"],
-        ["s", "workspace picker"],
+        ["C-A-s", "workspace picker"],
         ["w", "close pane"],
         ["f", "fullscreen"],
         ["C-A-r", "relayout"],

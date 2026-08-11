@@ -158,7 +158,7 @@ keybinds clear-defaults=true {
         // Workspace picker: fzf over the configured project dirs, opening the
         // selected one's layout in a new tab. Run through an interactive zsh so
         // the `zw` alias and the work-dir env vars its config expands are set.
-        bind "Alt s" {
+        bind "Ctrl Alt s" {
             Run "zsh" "-ic" "zellij-workspace" {
                 floating true
                 name "workspace"
