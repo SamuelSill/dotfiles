@@ -248,6 +248,7 @@ def pick(workspaces):
         "--preview", f"{shlex.quote(sys.executable)} "
                      f"{shlex.quote(str(Path(__file__).resolve()))} --preview {{}}",
         "--preview-window=right:65%",
+        "--bind=tab:down,shift-tab:up",
     ]
 
     try:
