@@ -147,6 +147,38 @@ map('n', '<C-h>', '<C-w>h', { desc = 'Focus window left' })
 map('n', '<C-j>', '<C-w>j', { desc = 'Focus window below' })
 map('n', '<C-k>', '<C-w>k', { desc = 'Focus window above' })
 map('n', '<C-l>', '<C-w>l', { desc = 'Focus window right' })
+-- Resize shadows the focus maps: same ctrl+hjkl, plus shift. Distinguishing
+-- ctrl+shift+letter from plain ctrl+letter needs the kitty keyboard protocol,
+-- and kitty.conf has to no_op these four or kitty swallows them first.
+map('n', '<C-S-h>', '<cmd>vertical resize -4<cr>', { desc = 'Window narrower' })
+map('n', '<C-S-l>', '<cmd>vertical resize +4<cr>', { desc = 'Window wider' })
+map('n', '<C-S-j>', '<cmd>resize -2<cr>',          { desc = 'Window shorter' })
+map('n', '<C-S-k>', '<cmd>resize +2<cr>',          { desc = 'Window taller' })
+-- 'd' for distribute: ctrl+shift+e is kitty's URL hints, worth keeping.
+map('n', '<C-S-d>', '<C-w>=',                      { desc = 'Equalize window sizes' })
+
+-- Zoom the focused window to fill the tab page, like zellij's Alt-f fullscreen.
+-- winrestcmd() replays each window's exact size on the way back out, where a
+-- plain <C-w>= would flatten any manual resizing. A layout saved against a
+-- different set of windows can't be replayed, so opening/closing one while
+-- zoomed drops the saved layout and leaves the zoom in place.
+do
+  local zoomed = nil
+  map('n', '<M-m>', function()
+    if zoomed and zoomed.count == vim.fn.winnr('$') then
+      vim.cmd(zoomed.layout)
+      zoomed = nil
+      return
+    end
+    if vim.fn.winnr('$') == 1 then
+      zoomed = nil
+      return
+    end
+    zoomed = { layout = vim.fn.winrestcmd(), count = vim.fn.winnr('$') }
+    vim.cmd.wincmd('_')
+    vim.cmd.wincmd('|')
+  end, { desc = 'Zoom window to full screen (toggle)' })
+end
 map('n', '<leader>yp', function()
   local rel = vim.fn.expand('%:.')
   vim.fn.setreg('+', rel)
