@@ -211,10 +211,10 @@ keybinds clear-defaults=true {
     // Rename directly instead of entering pane/tab mode first (those modes are
     // no longer reachable — their Ctrl p / Ctrl t entries are gone).
     shared_except "locked" "renamepane" {
-        bind "Ctrl Shift r" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "Alt t" { SwitchToMode "renamepane"; }
     }
     shared_except "locked" "renametab" {
-        bind "Ctrl t" { SwitchToMode "renametab"; TabNameInput 0; }
+        bind "Ctrl t" { SwitchToMode "renametab"; }
     }
     shared_except "locked" "resize" {
         bind "Ctrl z" { SwitchToMode "resize"; }

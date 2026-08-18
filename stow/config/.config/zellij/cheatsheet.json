@@ -22,6 +22,7 @@
         ["h j k l", "focus"],
         ["1-9", "tab"],
         ["n", "create menu"],
+        ["t", "rename pane"],
         ["C-A-s", "workspace picker"],
         ["w", "close pane"],
         ["f", "fullscreen"],
@@ -39,7 +40,6 @@
       "band": { "bg": "#3b2f52", "bg_alt": "#4f3f6e" },
       "items": [
         ["C-h", "move"],
-        ["C-r", "rename pane"],
         ["C-t", "rename tab"],
         ["C-z", "resize"],
         ["C-f", "scroll"],
