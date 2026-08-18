@@ -18,7 +18,7 @@
     }
   },
   "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": false,
     "pr@ai-tools": true,
     "plannotator@plannotator": true
   },
