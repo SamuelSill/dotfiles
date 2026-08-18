@@ -54,6 +54,8 @@
     ["<leader>hd", "derived types"],
     ["<leader>hi", "implementors"],
 
+    ["<leader>v", "md preview"],
+
     ["<leader>yp", "rel path"],
     ["<leader>yP", "full path"],
     ["<leader>yl", "rel path +line"],
