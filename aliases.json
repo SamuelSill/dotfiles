@@ -126,5 +126,9 @@
   {
     "name": ["zellij-workspace", "zw"],
     "command": "python3 \"$DOTFILES_DIR/zellij-utils/launch_workspace.py\" $@"
+  },
+  {
+    "name": "lg",
+    "command": "nvim -c \"Lazygit! $@\""
   }
 ]
