@@ -14,6 +14,8 @@ opt.updatetime = 250
 opt.timeoutlen = 350          -- also how long a pause on the leader waits before topbar
 opt.scrolloff = 8
 opt.undofile = true
+opt.shada:prepend("'1000")
+opt.shada:remove("'100")
 opt.splitright = true
 opt.splitbelow = true
 opt.cursorline = true

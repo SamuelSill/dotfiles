@@ -11,25 +11,10 @@ map('n', '<leader>e',  '<cmd>NvimTreeFindFileToggle<cr>', { desc = 'Explorer (re
 map('n', '<M-d>', lsp.smart_goto_definition, { desc = 'Goto definition / file under cursor' })
 map('n', '<M-r>', lsp.smart_references, { desc = 'Goto references' })
 
--- v:oldfiles is a snapshot read from the shada file at startup: it never grows
--- during the session, so files visited since launch are missing from it and its
--- order is stale. Keep our own most-recent-first list of real file buffers, and
--- treat it as newer than everything in v:oldfiles.
-local session_recent = {}
-vim.api.nvim_create_autocmd('BufEnter', {
-  callback = function(args)
-    if vim.bo[args.buf].buftype ~= '' then return end
-    local file = vim.api.nvim_buf_get_name(args.buf)
-    if file == '' then return end
-    for i, f in ipairs(session_recent) do
-      if f == file then
-        table.remove(session_recent, i)
-        break
-      end
-    end
-    table.insert(session_recent, 1, file)
-  end,
-})
+-- config.recent_files is per-project and live; v:oldfiles is a global snapshot
+-- read from shada at startup, so it never grows during the session and its order
+-- is stale. Prefer the former, and fall back to the latter for older visits.
+local recent_files = require('config.recent_files')
 
 -- Find-files with recently-visited files floated to the top: prepend this cwd's
 -- recents to fd's stream, dedupe (recents win), and break fzf score ties by
@@ -40,7 +25,7 @@ local function find_files_recent_first()
   local prefix = cwd .. '/'
   local current = vim.api.nvim_buf_get_name(0)          -- already open: don't rank it first
   local seen, recent = { [current] = true }, {}
-  for _, list in ipairs({ session_recent, vim.v.oldfiles }) do
+  for _, list in ipairs({ recent_files.list(), vim.v.oldfiles }) do
     for _, f in ipairs(list) do
       if not seen[f] and f:sub(1, #prefix) == prefix and vim.uv.fs_stat(f) then
         seen[f] = true
