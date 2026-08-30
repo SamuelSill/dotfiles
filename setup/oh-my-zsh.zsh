@@ -14,7 +14,12 @@ ZSH_THEME_GIT_PROMPT_CLEAN=""
 
 # Tick the clock in the prompt once a second while idle.
 TMOUT=1
-TRAPALRM() { (( prompt_clock_paused )) || zle reset-prompt }
+TRAPALRM() {
+    (( prompt_clock_paused )) && return
+    zle reset-prompt
+
+    [[ -n $__searching ]] && __searching=$LASTWIDGET
+}
 
 typeset -g prompt_clock_paused=0
 
