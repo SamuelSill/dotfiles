@@ -1,3 +1,6 @@
+**IMPORTANT:** You must follow the following guidelines strictly. Failing to follow any of them would result in
+incorrect outcome, which is not acceptable.
+
 # General Instructions and Context
 
 ## Software Development
@@ -55,7 +58,7 @@ we chose a solution that is not the immediate most inuitive one, in which case w
 
 #### When to Comment:
 
-Specifically for comments, you should avoid them completely unless absolutely necessary. Comments are usually a code smell,
+Specifically for comments, you should **avoid them completely** unless absolutely necessary. Comments are usually a code smell,
 indicating that the code isn't readable enough to explain itself - if you think of adding a comment, it probably indicates that the code should be cleaner and more readable.
 The justification for comments:
 * When the underlying algorithm is inherently difficult, and the code can't explain it by itself, or when the code is doing something
