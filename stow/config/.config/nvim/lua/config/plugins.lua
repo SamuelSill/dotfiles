@@ -77,11 +77,147 @@ require('lazy').setup({
       vim.g.fzf_history_dir = vim.fn.stdpath('state') .. '/fzf-lua-history'
       vim.fn.mkdir(vim.g.fzf_history_dir, 'p')
 
+      -- Preview <-> prompt focus, vim-style: from the prompt, whichever of
+      -- ctrl-h/j/k/l points at the preview enters it, and from the preview any of
+      -- them returns. A key that doesn't point at the preview is forwarded to fzf
+      -- as its raw control byte, so ctrl-h stays backspace and ctrl-j/ctrl-k stay
+      -- list navigation.
+      local focus_directions = { h = 'left', j = 'down', k = 'up', l = 'right' }
+      local fzf_control_bytes = { h = '\8', j = '\10', k = '\11', l = '\12' }
+
+      -- The file swapped into the preview window, kept so it can be surfaced
+      -- again if the picker closes while it still holds unsaved edits.
+      local edited = nil
+
+      local function focus_prompt()
+        local win = require('fzf-lua.win').__SELF()
+        if not win or not win.fzf_winid then return end
+
+        vim.api.nvim_set_current_win(win.fzf_winid)
+        vim.cmd('startinsert')
+      end
+
+      local function previewed_file_buffer()
+        local win = require('fzf-lua.win').__SELF()
+        local previewer = win and win._previewer
+        local entry = previewer and previewer.loaded_entry
+        if not entry then return nil end
+
+        if entry.bufnr and vim.api.nvim_buf_is_valid(entry.bufnr) then return entry.bufnr end
+        if not entry.path then return nil end
+
+        local fzf_path = require('fzf-lua.path')
+        local file = fzf_path.is_absolute(entry.path) and entry.path
+          or fzf_path.join({ previewer.opts.cwd or vim.uv.cwd(), entry.path })
+
+        return vim.fn.bufadd(file)
+      end
+
+      -- fzf-lua previews a throwaway copy of the file, so edits made in it would
+      -- go nowhere. Swap in the file's real buffer on focus: the preview window
+      -- becomes an ordinary window on the file (edit it, `:w` it) with the picker
+      -- still running behind it. The copy is kept loaded rather than wiped, so
+      -- fzf-lua's preview cache doesn't end up pointing at a dead buffer.
+      -- A leftover swapfile would pop the recovery prompt (or fail outright) from
+      -- inside the preview, so answer it here: take the file when the owning
+      -- process is gone, otherwise settle for a read-only view of it.
+      local function load_answering_swap_prompt(buf)
+        local group = vim.api.nvim_create_augroup('FzfLuaPreviewSwap', { clear = true })
+        vim.api.nvim_create_autocmd('SwapExists', {
+          group = group,
+          callback = function()
+            local pid = vim.fn.swapinfo(vim.v.swapname).pid
+            local owner_alive = type(pid) == 'number' and pid > 0
+              and select(1, pcall(vim.uv.kill, pid, 0)) == true
+            vim.v.swapchoice = owner_alive and 'o' or 'e'
+          end,
+        })
+
+        local loaded = pcall(vim.fn.bufload, buf)
+        vim.api.nvim_del_augroup_by_id(group)
+
+        return loaded
+      end
+
+      local function show_real_file_in_preview(preview_winid)
+        local buf = previewed_file_buffer()
+        if not buf or not load_answering_swap_prompt(buf) then return end
+
+        local position = vim.api.nvim_win_get_cursor(preview_winid)
+        -- fzf-lua styles the preview through buffer-local window options, which
+        -- the incoming buffer wouldn't inherit.
+        local style = {}
+        for _, option in ipairs({ 'number', 'relativenumber', 'cursorline', 'wrap', 'signcolumn' }) do
+          style[option] = vim.wo[preview_winid][0][option]
+        end
+
+        vim.bo[vim.api.nvim_win_get_buf(preview_winid)].bufhidden = 'hide'
+        vim.api.nvim_win_set_buf(preview_winid, buf)
+        pcall(vim.api.nvim_win_set_cursor, preview_winid, position)
+        for option, value in pairs(style) do
+          vim.wo[preview_winid][0][option] = value
+        end
+        edited = { buf = buf, position = position }
+      end
+
+      -- Closing the picker takes the preview window with it, which would otherwise
+      -- leave unsaved edits in a buffer the user never opened themselves.
+      local function surface_edited_file()
+        local pending = edited
+        edited = nil
+        if not pending or not vim.api.nvim_buf_is_valid(pending.buf) then return end
+        if not vim.bo[pending.buf].modified then return end
+        if #vim.fn.win_findbuf(pending.buf) > 0 then return end
+
+        vim.schedule(function()
+          vim.api.nvim_win_set_buf(0, pending.buf)
+          pcall(vim.api.nvim_win_set_cursor, 0, pending.position)
+        end)
+      end
+
+      -- The preview holds a real buffer now, so these maps are buffer-local and
+      -- dropped the moment it loses focus -- they must not leak into normal editing.
+      local function map_return_to_prompt(preview_winid)
+        local buf = vim.api.nvim_get_current_buf()
+        for key in pairs(focus_directions) do
+          vim.keymap.set('n', '<C-' .. key .. '>', focus_prompt, { buffer = buf, nowait = true })
+        end
+
+        vim.api.nvim_create_autocmd('WinLeave', {
+          once = true,
+          callback = function()
+            if edited and vim.api.nvim_get_current_win() == preview_winid then
+              edited.position = vim.api.nvim_win_get_cursor(preview_winid)
+            end
+
+            for key in pairs(focus_directions) do
+              pcall(vim.keymap.del, 'n', '<C-' .. key .. '>', { buffer = buf })
+            end
+          end,
+        })
+      end
+
+      local function focus_preview(key)
+        return function()
+          local win = require('fzf-lua.win').__SELF()
+          if not win or not win:validate_preview()
+              or win:normalize_preview_layout().pos ~= focus_directions[key] then
+            return vim.api.nvim_chan_send(vim.b.terminal_job_id, fzf_control_bytes[key])
+          end
+
+          local preview_winid = win.preview_winid
+          vim.api.nvim_set_current_win(preview_winid)
+          show_real_file_in_preview(preview_winid)
+          map_return_to_prompt(preview_winid)
+        end
+      end
+
       -- --multi is off for files/lsp/grep: with it on, a >1 selection on <CR>
       -- runs file_edit_or_qf and dumps the paths into a quickfix window instead
       -- of just opening the one entry.
       require('fzf-lua').setup({
         fzf_opts = { ['--cycle'] = true, ['-i'] = true },
+        winopts = { on_close = surface_edited_file },
         keymap = {
           fzf = {
             true,
