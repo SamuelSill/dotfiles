@@ -56,7 +56,9 @@ map('n', '<leader>fa', find_files_under('/'),           { desc = 'Find files any
 map('n', '<leader>fu', find_files_under(vim.env.HOME),  { desc = 'Find files in home directory' })
 -- Grep supports a trailing ` -- <glob>` file filter, e.g.  TODO -- *.{h,cc} !*test*
 map('n', '<leader>fg', fzf.live_grep,            { desc = 'Grep in project (+ file glob)' })
-map('x', '<leader>fg', fzf.grep_visual,          { desc = 'Grep selection in project' })
+map('x', '<leader>fg', function()
+  fzf.live_grep({ search = require('fzf-lua.utils').get_visual_selection() })
+end, { desc = 'Grep selection in project (editable)' })
 map('n', '<leader>fs', fzf.lsp_live_workspace_symbols, { desc = 'Find symbol in project (#)' })
 map('n', '<leader>fS', fzf.lsp_document_symbols,       { desc = 'Find symbol in current file (@)' })
 map('n', '<leader>fb', fzf.buffers,              { desc = 'Open buffers' })
