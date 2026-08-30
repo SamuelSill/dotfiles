@@ -87,8 +87,8 @@ require('lazy').setup({
             true,
             ['tab']       = 'down',
             ['shift-tab'] = 'up',
-            ['alt-[']     = 'prev-history',
-            ['alt-]']     = 'next-history',
+            ['alt-p']     = 'prev-history',
+            ['alt-n']     = 'next-history',
             ['ctrl-p']    = 'up',
             ['ctrl-n']    = 'down',
           },
@@ -105,6 +105,23 @@ require('lazy').setup({
           rg_opts = '--column --line-number --no-heading --color=always '
             .. '--ignore-case --hidden --glob=!.git/ --max-columns=4096 -e',
         },
+      })
+
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'fzf',
+        callback = function(args)
+          local function send(bytes)
+            return function() vim.api.nvim_chan_send(vim.b.terminal_job_id, bytes) end
+          end
+
+          vim.keymap.set('t', '<M-[>', send('\27p'), { buffer = args.buf, nowait = true })
+          vim.keymap.set('t', '<M-]>', send('\27n'), { buffer = args.buf, nowait = true })
+
+          for key in pairs(focus_directions) do
+            vim.keymap.set('t', '<C-' .. key .. '>', focus_preview(key),
+              { buffer = args.buf, nowait = true })
+          end
+        end,
       })
 
       -- Work around an upstream fzf-lua crash: the builtin previewer's grep match
