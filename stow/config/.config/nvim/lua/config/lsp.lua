@@ -82,6 +82,7 @@ local function set_reference_hl()
   -- so they end up *less* visible than normal code. Add an undercurl so they read
   -- as flagged, not just dim.
   vim.api.nvim_set_hl(0, 'DiagnosticUnnecessary', { undercurl = true, sp = '#e5c07b' })
+  vim.api.nvim_set_hl(0, '@lsp.type.unresolvedReference', { underdotted = true, sp = '#c678dd' })
 end
 set_reference_hl()
 vim.api.nvim_create_autocmd('ColorScheme', { callback = set_reference_hl })
