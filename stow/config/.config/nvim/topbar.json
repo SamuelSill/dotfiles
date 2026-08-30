@@ -39,6 +39,7 @@
     ["<leader>dd", "show error"],
     ["<leader>dv", "toggle inline"],
 
+    ["<leader>gg", "lazygit"],
     ["<leader>gb", "blame line"],
     ["<leader>gf", "file history"],
     ["<leader>gl", "line history"],

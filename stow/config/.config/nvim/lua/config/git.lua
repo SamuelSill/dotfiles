@@ -1,7 +1,9 @@
--- config/git.lua -- git blame / line history / hunk staging (gitsigns + fugitive)
--- and merge-conflict navigation & resolution (git-conflict.nvim).
+-- config/git.lua -- git blame / line history / hunk staging (gitsigns + fugitive),
+-- merge-conflict navigation & resolution (git-conflict.nvim), and lazygit.
 
 local map = vim.keymap.set
+-- Required eagerly: it registers the :LazygitEdit command lazygit calls back into.
+local lazygit = require('config.lazygit')
 
 local function selected_range()
   local s, e = vim.fn.line('v'), vim.fn.line('.')
@@ -15,6 +17,9 @@ map('n', '<leader>gB', function() require('gitsigns').toggle_current_line_blame(
   { desc = 'Toggle inline blame' })
 map('n', '<leader>gv', '<cmd>Git blame<cr>', { desc = 'Blame column (side-by-side)' })
 
+-- lazygit, full-screen in this Neovim. <C-x> inside it hides it without quitting;
+-- opening a file from it does the same, so this key brings it back where you left it.
+map('n', '<leader>gg', lazygit.toggle, { desc = 'lazygit' })
 
 -- In both history pickers: <cr> opens the commit, <c-k> its pull request,
 -- <c-y> yanks the sha.

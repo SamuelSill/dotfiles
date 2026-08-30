@@ -19,3 +19,18 @@ git:
   pagers:
     - colorArg: always
       pager: delta --paging=never
+
+os:
+  # lazygit normally runs inside a Neovim terminal (see the nvim config's
+  # config/lazygit.lua), and $NVIM addresses that instance: files open there, with
+  # plugins and language servers already warm, instead of in an editor started from
+  # scratch per file. Run from a plain shell instead, each command falls back to an
+  # editor of its own. Quoting: {{filename}} arrives shell-quoted, and closing our
+  # own quote around it hands Neovim a single argument, quotes stripped and any
+  # spaces intact.
+  # The preset supplies editAtLineAndWait, the one command that needs a process to
+  # wait on and so has to be an editor of its own.
+  editPreset: 'nvim'
+  edit: 'if [ -z "$NVIM" ]; then nvim -- {{filename}}; else nvim --server "$NVIM" --remote-send "<C-\\><C-n>:LazygitEdit "{{filename}}"<CR>"; fi'
+  editAtLine: 'if [ -z "$NVIM" ]; then nvim +{{line}} -- {{filename}}; else nvim --server "$NVIM" --remote-send "<C-\\><C-n>:LazygitEdit +{{line}} "{{filename}}"<CR>"; fi'
+  openDirInEditor: 'if [ -z "$NVIM" ]; then nvim -- {{dir}}; else nvim --server "$NVIM" --remote-send "<C-\\><C-n>:LazygitEdit "{{dir}}"<CR>"; fi'
