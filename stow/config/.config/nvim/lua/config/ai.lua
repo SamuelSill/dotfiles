@@ -1,7 +1,8 @@
 -- config/ai.lua -- ask Claude a question about the current line / visual
 -- selection, headless (`claude -p`), answer shown in a scratch float. Strictly
 -- read-only Q&A: no session, no edits, no diffs -- for changes, run claude in a
--- terminal. The keymap lives in config/keymaps.lua.
+-- terminal. Runs at low effort to keep the answer snappy. The keymap lives in
+-- config/keymaps.lua.
 
 local M = {}
 
@@ -65,7 +66,7 @@ function M.ask()
     }, '\n')
 
     vim.notify('Asking claude about ' .. loc .. '…')
-    vim.system({ 'claude', '-p' }, { stdin = prompt, text = true }, function(res)
+    vim.system({ 'claude', '-p', '--effort', 'low' }, { stdin = prompt, text = true }, function(res)
       vim.schedule(function()
         local out = (res.code == 0 and res.stdout ~= '') and res.stdout
           or ('**claude failed** (exit ' .. res.code .. ')\n\n' .. (res.stderr or ''))
