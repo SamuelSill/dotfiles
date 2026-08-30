@@ -15,15 +15,31 @@ map('n', '<leader>gB', function() require('gitsigns').toggle_current_line_blame(
   { desc = 'Toggle inline blame' })
 map('n', '<leader>gv', '<cmd>Git blame<cr>', { desc = 'Blame column (side-by-side)' })
 
-map('n', '<leader>gf', '<cmd>Git log --follow -- %<cr>', { desc = 'File history' })
+
+-- In both history pickers: <cr> opens the commit, <c-k> its pull request,
+-- <c-y> yanks the sha.
+map('n', '<leader>gf', function() require('config.git_history').file() end,
+  { desc = 'File history' })
 map('n', '<leader>gl', function()
   local l = vim.fn.line('.')
-  vim.cmd(string.format('Git log -L %d,%d:%%', l, l))
+  require('config.git_history').line(l, l)
 end, { desc = 'Line history' })
 map('x', '<leader>gl', function()
-  local s, e = selected_range()
-  vim.cmd(string.format('Git log -L %d,%d:%%', s, e))
+  require('config.git_history').line(selected_range())
 end, { desc = 'Line history (selection)' })
+
+map('n', '<leader>gk', function()
+  require('config.git_history').pull_request_for_line(vim.fn.line('.'))
+end, { desc = 'Open pull request for line' })
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'fugitiveblame',
+  callback = function(args)
+    map('n', '<leader>gk', function()
+      require('config.git_history').pull_request_for_blame_line()
+    end, { buffer = args.buf, desc = 'Open pull request for blame line' })
+  end,
+})
 
 -- Working-tree diff if the line sits in an uncommitted hunk, else blame the
 -- commit that last touched it (<leader>gb only ever does the latter).

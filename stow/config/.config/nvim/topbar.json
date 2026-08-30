@@ -42,6 +42,7 @@
     ["<leader>gb", "blame line"],
     ["<leader>gf", "file history"],
     ["<leader>gl", "line history"],
+    ["<leader>gk", "line pull request"],
     ["<leader>gc", "line change"],
     ["<leader>gr", "restore line"],
     ["<leader>gs", "stage hunk/sel"],

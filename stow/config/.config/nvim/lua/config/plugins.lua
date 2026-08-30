@@ -45,7 +45,12 @@ require('lazy').setup({
     -- statusline is drawn as an extra row under the reserved topbar window.
     opts = {
       options = { theme = 'tokyonight', globalstatus = true },
-      sections = { lualine_c = { { 'filename', path = 1 } } },  -- path relative to cwd
+      sections = {
+        lualine_b = { 'diagnostics' },
+        lualine_c = { { 'filename', path = 1 } },  -- path relative to cwd
+        lualine_x = { 'fileformat' },
+        lualine_y = {},
+      },
     },
   },
 
